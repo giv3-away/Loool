@@ -39,14 +39,18 @@
     #fakeFeed {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(10px);
       font-size: 14px;
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       white-space: nowrap;
       opacity: 0;
-      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+      transition: all 0.8s ease-in-out;
     }
 
-    /* Main content */
+    /* Main */
     main {
       padding: 20px;
       text-align: center;
@@ -60,7 +64,7 @@
       padding: 15px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: center;
-      animation: fadeIn 0.6s ease;
+      animation: fadeIn 0.8s ease;
     }
     #offerwall h2, #reward h2 {
       font-size: 20px;
@@ -80,7 +84,7 @@
       height: 100%;
       width: 0%;
       background: #1446FF;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 1s ease;
     }
 
     /* Popup styles */
@@ -89,16 +93,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      background: #eee;
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
       display: none;
       z-index: 1000;
       text-align: center;
       width: 300px;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
     }
     .popup.show {
       display: block;
@@ -157,9 +161,9 @@
   <main>
     <!-- Offers -->
     <section id="offerwall">
-      <h2>Offers</h2>
-      <!-- CPA Network Script Embed -->
+      <h2>Complete offers to win Robux</h2>
       <div id="offerList">
+        <!-- CPA Network Script Embed -->
         <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
       </div>
     </section>
@@ -196,7 +200,6 @@
     <small>Might take some time.</small>
   </div>
 
-  <!-- Reward Popup -->
   <div class="popup" id="popupReward">
     <p id="rewardMessage"></p>
     <button onclick="claimReward()">Claim</button>
@@ -205,19 +208,16 @@
   <script>
     // Robux counter
     let robux = parseInt(localStorage.getItem("robux") || "0");
-
     function animateNumber(el, start, end, duration = 600) {
       const range = end - start;
       const startTime = performance.now();
       function step(currentTime) {
         const progress = Math.min((currentTime - startTime) / duration, 1);
-        const value = Math.floor(start + range * progress);
-        el.innerText = value;
+        el.innerText = Math.floor(start + range * progress);
         if (progress < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
     }
-
     function updateCounter(bump=true) {
       const counter = document.getElementById("robuxCounter");
       const currentValue = parseInt(counter.innerText || "0");
@@ -229,7 +229,7 @@
     }
     updateCounter(false);
 
-    // Progress bar
+    // Progress
     let progress = 0;
     function updateProgress(amount) {
       progress += amount;
@@ -240,10 +240,10 @@
       document.getElementById("progressBar").style.width = (progress/50*100) + "%";
     }
 
-    // Reward system
+    // Rewards
     let pendingReward = 0;
     function randomPrize() {
-      let prize = Math.floor(Math.random() * 11) + 10; // 10-20
+      let prize = Math.floor(Math.random() * 11) + 10;
       pendingReward = prize;
       document.getElementById("rewardMessage").innerText = "You won " + prize + " Robux";
       showPopup("popupReward");
@@ -258,7 +258,7 @@
       closePopup("popupReward");
     }
 
-    // Cashout system
+    // Cashout
     let cashoutUsername = "";
     function openCashout() {
       if (robux < 1000) {
@@ -287,7 +287,7 @@
       }
     }
 
-    // Popup show/hide with animations
+    // Popups
     function showPopup(id) {
       const el = document.getElementById(id);
       el.style.display = "block";
@@ -296,30 +296,27 @@
     function closePopup(id) {
       const el = document.getElementById(id);
       el.classList.remove("show");
-      setTimeout(()=> el.style.display="none", 300);
+      setTimeout(()=> el.style.display="none", 400);
     }
 
     // Fake feed
     const fakeFeed = document.getElementById("fakeFeed");
-    const baseWords = [
-      "moon","star","fire","wind","rock","sand","wave","tree","lion","frog",
-      "wolf","snow","rain","dark","void","dust","bird","iron","gold","lava"
-    ];
+    const baseWords = ["moon","star","fire","wind","rock","sand","wave","lion","wolf","rain","snow","iron","gold"];
     function randomUsername() {
       let word = baseWords[Math.floor(Math.random() * baseWords.length)];
-      let letters = String.fromCharCode(97 + Math.floor(Math.random()*26)) +
-                    String.fromCharCode(97 + Math.floor(Math.random()*26));
+      let letters = String.fromCharCode(97+Math.floor(Math.random()*26))+
+                    String.fromCharCode(97+Math.floor(Math.random()*26));
       return word + letters;
     }
     function showFakeFeed() {
       let user = randomUsername();
-      let amount = Math.floor(Math.random() * 4001) + 1000; // 1000-5000
+      let amount = Math.floor(Math.random() * 4001) + 1000;
       fakeFeed.innerHTML = user + " cashed out " + amount + " Robux";
       fakeFeed.style.opacity = 1;
       fakeFeed.style.transform = "translateX(-50%) translateY(0)";
-      setTimeout(()=>{ fakeFeed.style.opacity = 0; }, 5000);
+      setTimeout(()=> fakeFeed.style.opacity = 0, 5000);
     }
-    setInterval(showFakeFeed, 15000); // every 15s
+    setInterval(showFakeFeed, 15000);
   </script>
 </body>
 </html>
