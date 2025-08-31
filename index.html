@@ -21,6 +21,7 @@
       align-items: center;
       padding: 12px 20px;
       font-weight: bold;
+      position: relative;
     }
     .top-item {
       display: flex;
@@ -33,51 +34,57 @@
       height: 24px;
     }
 
+    /* Fake feed (centered text) */
+    #feed {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      font-weight: normal;
+      display: none;
+    }
+
     /* Main content */
     main {
       padding: 20px;
       text-align: center;
     }
 
-    button {
-      background: #1446FF;
+    /* Roblox-style ad button */
+    .ad-btn {
+      background: #E00000; /* Roblox red */
       color: white;
       border: none;
       padding: 12px 20px;
       font-size: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       margin: 20px 0;
-      transition: background 0.3s;
     }
-    button:hover {
-      background: #0f34c9;
+    .ad-btn span {
+      font-size: 20px;
+      font-weight: bold;
     }
 
-    /* Offerwall section */
-    #offerwall {
-      margin-top: 30px;
-      background: white;
-      border-radius: 10px;
+    .offer-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1446FF;
+      margin: 15px 0;
+    }
+
+    /* Scrollable offers */
+    #offers {
+      max-height: 300px;
+      overflow-y: auto;
+      background: #fff;
       padding: 15px;
+      border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: left;
-    }
-    #offerwall h2 {
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: #1446FF;
-    }
-
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-    }
-
-    /* Hide images inside the AdGem wall → makes it look text-only */
-    iframe::-webkit-scrollbar {
-      display: none;
     }
   </style>
 </head>
@@ -89,8 +96,9 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" alt="Robux">
       <span id="robuxCounter">0</span>
     </div>
+    <div id="feed"></div>
     <div class="top-item">
-      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Cash Out">
+      <img src="https://cdn-icons-png.flaticon.com/512/2769/2769387.png" alt="Cash Out">
       <span>Cash Out</span>
     </div>
   </header>
@@ -99,15 +107,23 @@
   <main>
     <h1>Welcome to Easy Robux</h1>
     <p>Earn free Robux by completing simple tasks and offers.</p>
-    <button onclick="addRobux()">▶ Watch Ad</button>
 
-    <!-- Offerwall -->
-    <section id="offerwall">
-      <h2>Complete Tasks</h2>
-      <iframe id="adgemWall" 
-              src="https://api.adgem.com/v1/wall?appid=31046&playerid=testuser">
-      </iframe>
-    </section>
+    <div class="offer-title">
+      Complete offer for 10 
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="18">
+    </div>
+    <div id="offers">
+      <!-- Offers will be listed here later -->
+      <p>No offers available yet.</p>
+    </div>
+
+    <div class="offer-title">
+      Watch Ad for 2 
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="18">
+    </div>
+    <button class="ad-btn" onclick="addRobux()">
+      <span>▶</span>
+    </button>
   </main>
 
   <script>
@@ -119,21 +135,30 @@
     }
 
     function addRobux() {
-      robux += 1;
+      robux += 2;
       localStorage.setItem("robux", robux);
       updateCounter();
     }
 
     updateCounter();
 
-    // Generate unique playerid per user
-    let playerid = localStorage.getItem("playerid");
-    if (!playerid) {
-      playerid = "user_" + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem("playerid", playerid);
+    // Fake feed system
+    const feed = document.getElementById("feed");
+    const usernames = ["xXNoobSlayerXx", "CoolKid21", "ProBuilder", "Guest123", "PixelMaster", "GameOver99"];
+    
+    function showFeed() {
+      const user = usernames[Math.floor(Math.random() * usernames.length)];
+      const amount = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+      feed.innerHTML = `${user} cashed out ${amount} <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="14">`;
+      feed.style.display = "block";
+
+      setTimeout(() => {
+        feed.style.display = "none";
+      }, 5000); // disappears after 5s
     }
-    document.getElementById("adgemWall").src = 
-      "https://api.adgem.com/v1/wall?appid=31046&playerid=" + playerid;
+
+    // Show feed every ~30 seconds
+    setInterval(showFeed, 30000);
   </script>
 </body>
 </html>
