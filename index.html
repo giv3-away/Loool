@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Easy Robux</title>
+  <title>EazyRobux</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,6 +44,10 @@
       white-space: nowrap;
       opacity: 0;
       transition: opacity 1s ease-in-out;
+      background: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
 
     /* Main */
@@ -68,7 +72,18 @@
       color: #1446FF;
     }
 
-    /* Popup styles */
+    /* Overlay + Popup */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+      display: none;
+    }
+    .overlay.active {
+      display: block;
+    }
     .popup {
       position: fixed;
       top: 50%;
@@ -118,6 +133,14 @@
       font-size: 18px;
       cursor: pointer;
     }
+    .roblox-btn {
+      background: #E00000;
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 8px;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(15px);}
@@ -126,6 +149,9 @@
   </style>
 </head>
 <body>
+
+  <!-- Overlay for blocking clicks -->
+  <div id="overlay" class="overlay"></div>
 
   <!-- Top bar -->
   <header>
@@ -172,7 +198,24 @@
     <small>Might take some time.</small>
   </div>
 
+  <!-- First-time welcome popup -->
+  <div class="popup" id="popupWelcome">
+    <p><b>Welcome to EazyRobux</b><br>Win Robux By Completing Easy Offers</p>
+    <button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button>
+  </div>
+
   <script>
+    // === Anti-cheat (disable inspect tools) ===
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if (e.keyCode == 123 || // F12
+          (e.ctrlKey && e.shiftKey && ['I','C','J'].includes(e.key.toUpperCase())) ||
+          (e.ctrlKey && e.key.toLowerCase() === 'u')) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
     // Robux counter
     let robux = parseInt(localStorage.getItem("robux") || "0");
     function animateNumber(el, start, end, duration = 600) {
@@ -225,19 +268,21 @@
       }
     }
 
-    // Popups
+    // Popups (block background)
     function showPopup(id) {
+      document.getElementById("overlay").classList.add("active");
       const el = document.getElementById(id);
       el.style.display = "block";
       setTimeout(()=> el.classList.add("show"), 10);
     }
     function closePopup(id) {
+      document.getElementById("overlay").classList.remove("active");
       const el = document.getElementById(id);
       el.classList.remove("show");
       setTimeout(()=> el.style.display="none", 400);
     }
 
-    // Old Fake feed (simple every 30s)
+    // Fake feed
     const feed = document.getElementById("fakeFeed");
     const usernames = ["xXNoobSlayerXx", "CoolKid21", "ProBuilder", "Guest123", "PixelMaster", "GameOver99"];
     function showFeed() {
@@ -247,7 +292,19 @@
       feed.style.opacity = 1;
       setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
-    setInterval(showFeed, 30000); // every 30s
+    setInterval(showFeed, 30000);
+
+    // Welcome popup on first visit
+    if (!localStorage.getItem("welcomeShown")) {
+      setTimeout(()=> showPopup("popupWelcome"), 500);
+      localStorage.setItem("welcomeShown", "true");
+    }
+    function claimWelcome() {
+      robux += 100;
+      localStorage.setItem("robux", robux);
+      updateCounter();
+      closePopup("popupWelcome");
+    }
   </script>
 </body>
 </html>
