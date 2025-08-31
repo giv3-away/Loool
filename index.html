@@ -50,25 +50,6 @@
       text-align: center;
     }
 
-    /* Roblox-style ad button */
-    .ad-btn {
-      background: #E00000; /* Roblox red */
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .ad-btn span {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
     .offer-title {
       font-size: 18px;
       font-weight: bold;
@@ -78,13 +59,31 @@
 
     /* Scrollable offers */
     #offers {
-      max-height: 300px;
+      max-height: 320px;
       overflow-y: auto;
       background: #fff;
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: left;
+    }
+    .offer {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .offer:hover {
+      background: #f9f9f9;
+    }
+    .offer span {
+      font-weight: bold;
+      color: #1446FF;
+      margin-left: 6px;
     }
   </style>
 </head>
@@ -109,21 +108,12 @@
     <p>Earn free Robux by completing simple tasks and offers.</p>
 
     <div class="offer-title">
-      Complete offer for 10 
+      Complete offers to earn 
       <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="18">
     </div>
     <div id="offers">
-      <!-- Offers will be listed here later -->
-      <p>No offers available yet.</p>
+      <p>Loading offers...</p>
     </div>
-
-    <div class="offer-title">
-      Watch Ad for 2 
-      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="18">
-    </div>
-    <button class="ad-btn" onclick="addRobux()">
-      <span>▶</span>
-    </button>
   </main>
 
   <script>
@@ -132,12 +122,6 @@
 
     function updateCounter() {
       document.getElementById("robuxCounter").innerText = robux;
-    }
-
-    function addRobux() {
-      robux += 2;
-      localStorage.setItem("robux", robux);
-      updateCounter();
     }
 
     updateCounter();
@@ -157,8 +141,37 @@
       }, 5000); // disappears after 5s
     }
 
-    // Show feed every ~30 seconds
     setInterval(showFeed, 30000);
+
+    // === Fetch CPA Grip Offers via Proxy ===
+    const offersDiv = document.getElementById("offers");
+    const proxy = "https://cors-anywhere.herokuapp.com/";
+    const feedUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
+
+    fetch(proxy + feedUrl)
+      .then(res => res.json())
+      .then(data => {
+        offersDiv.innerHTML = "";
+        data.forEach(offer => {
+          let el = document.createElement("div");
+          el.className = "offer";
+          el.innerHTML = `${offer.offer_name} <span>+${offer.payout} Robux</span>`;
+          el.onclick = () => {
+            window.open(offer.show_url, "_blank");
+            // reward after returning
+            setTimeout(() => {
+              robux += parseInt(offer.payout);
+              localStorage.setItem("robux", robux);
+              updateCounter();
+            }, 5000); // simulate credit after 5s
+          };
+          offersDiv.appendChild(el);
+        });
+      })
+      .catch(err => {
+        offersDiv.innerHTML = "<p>Failed to load offers.</p>";
+        console.error(err);
+      });
   </script>
 </body>
 </html>
