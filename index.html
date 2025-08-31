@@ -1,234 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Easy Robux</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #f4f7ff;
+      margin: 0;
+      background: #f2f5ff;
       color: #222;
-      text-align: center;
     }
 
     /* Top bar */
-    .topbar {
-      background-color: #1446FF;
-      color: white;
+    header {
+      background: #1446FF;
+      color: #fff;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 20px;
+      font-weight: bold;
     }
-    .topbar .cashout, .topbar .balance {
+    .top-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-weight: bold;
+      cursor: pointer;
     }
-    .topbar img {
+    .top-item img {
       width: 24px;
       height: 24px;
     }
 
     /* Main content */
-    .container {
+    main {
       padding: 20px;
+      text-align: center;
     }
-    .watch-btn {
+
+    button {
       background: #1446FF;
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 20px;
-      padding: 15px 40px;
-      cursor: pointer;
-      margin: 20px 0;
-      transition: 0.2s;
-    }
-    .watch-btn:hover {
-      background: #0e34c1;
-    }
-
-    .tasks {
-      margin: 20px 0;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    /* Daily bonus */
-    .daily-bonus {
-      background: #fff;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 20px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .bonus-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 12px 20px;
       font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
+      margin: 20px 0;
+      transition: background 0.3s;
     }
-    .bonus-btn:disabled {
-      background: grey;
-      cursor: not-allowed;
+    button:hover {
+      background: #0f34c9;
     }
 
-    /* Unlockable prize */
-    .unlockable {
-      margin: 20px 0;
-      text-align: left;
-      padding: 15px;
+    /* Offerwall section */
+    #offerwall {
+      margin-top: 30px;
       background: white;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .progress {
-      width: 100%;
-      background: #ddd;
-      border-radius: 6px;
-      overflow: hidden;
-      height: 20px;
-      margin-top: 10px;
-    }
-    .progress-bar {
-      background: #1446FF;
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s;
-    }
-
-    /* Activity feed */
-    .feed {
-      background: #fff;
-      border-radius: 10px;
       padding: 15px;
-      margin: 20px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: left;
-      height: 150px;
-      overflow-y: auto;
-      font-size: 14px;
+    }
+    #offerwall h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #1446FF;
     }
 
-    footer {
-      margin: 30px 0;
-      color: #777;
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    /* Hide images inside the AdGem wall → makes it look text-only */
+    iframe::-webkit-scrollbar {
+      display: none;
     }
   </style>
 </head>
 <body>
+
   <!-- Top bar -->
-  <div class="topbar">
-    <div class="cashout">
-      <img src="https://img.icons8.com/ios-filled/50/ffffff/money-bag.png"/>
-      Cash Out
+  <header>
+    <div class="top-item">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" alt="Robux">
+      <span id="robuxCounter">0</span>
     </div>
-    <div class="balance">
-      <span id="robuxAmount">0</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Robux_2019_Logo_black.svg"/>
+    <div class="top-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Cash Out">
+      <span>Cash Out</span>
     </div>
-  </div>
+  </header>
 
-  <!-- Main container -->
-  <div class="container">
-    <button class="watch-btn" onclick="watchAd()">▶ Watch Ad</button>
+  <!-- Main -->
+  <main>
+    <h1>Welcome to Easy Robux</h1>
+    <p>Earn free Robux by completing simple tasks and offers.</p>
+    <button onclick="addRobux()">▶ Watch Ad</button>
 
-    <div class="tasks">
-      <h3>📋 Complete Tasks</h3>
-      <p>(CPA/CPI offers will go here)</p>
-    </div>
-
-    <div class="daily-bonus">
-      <h3>🎁 Daily Bonus</h3>
-      <button id="bonusBtn" class="bonus-btn" onclick="claimBonus()">Claim +5 Robux</button>
-    </div>
-
-    <div class="unlockable">
-      <h3>🔓 Unlockable Prize at 100 Robux</h3>
-      <div class="progress">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-    </div>
-
-    <div class="feed" id="feed">
-      <h3>⚡ Live Activity</h3>
-    </div>
-  </div>
-
-  <footer>
-    Easy Robux © 2025
-  </footer>
+    <!-- Offerwall -->
+    <section id="offerwall">
+      <h2>Complete Tasks</h2>
+      <iframe id="adgemWall" 
+              src="https://api.adgem.com/v1/wall?appid=31046&playerid=testuser">
+      </iframe>
+    </section>
+  </main>
 
   <script>
-    // Robux amount tracking
-    let robux = parseInt(localStorage.getItem("robux")) || 0;
-    const robuxDisplay = document.getElementById("robuxAmount");
-    const progressBar = document.getElementById("progressBar");
-    robuxDisplay.textContent = robux;
-    updateProgress();
+    // Robux counter system (localStorage based)
+    let robux = parseInt(localStorage.getItem("robux") || "0");
 
-    function addRobux(amount) {
-      robux += amount;
+    function updateCounter() {
+      document.getElementById("robuxCounter").innerText = robux;
+    }
+
+    function addRobux() {
+      robux += 1;
       localStorage.setItem("robux", robux);
-      robuxDisplay.textContent = robux;
-      updateProgress();
+      updateCounter();
     }
 
-    function watchAd() {
-      addRobux(1); // +1 per ad (placeholder)
-      addFeed("watched an ad", 1);
+    updateCounter();
+
+    // Generate unique playerid per user
+    let playerid = localStorage.getItem("playerid");
+    if (!playerid) {
+      playerid = "user_" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("playerid", playerid);
     }
-
-    // Daily bonus logic
-    const bonusBtn = document.getElementById("bonusBtn");
-    const lastBonus = localStorage.getItem("lastBonus");
-
-    function claimBonus() {
-      const today = new Date().toDateString();
-      localStorage.setItem("lastBonus", today);
-      addRobux(5);
-      bonusBtn.disabled = true;
-      bonusBtn.textContent = "Already claimed today";
-      addFeed("claimed daily bonus", 5);
-    }
-
-    if (lastBonus === new Date().toDateString()) {
-      bonusBtn.disabled = true;
-      bonusBtn.textContent = "Already claimed today";
-    }
-
-    // Progress bar
-    function updateProgress() {
-      const percent = Math.min((robux / 100) * 100, 100);
-      progressBar.style.width = percent + "%";
-    }
-
-    // Fake activity feed
-    const feed = document.getElementById("feed");
-    const names = ["Player123", "NoobMaster", "EpicGamer", "CoolKid", "Guest001", "ProRobloxer"];
-    function addFeed(action, amount) {
-      const name = names[Math.floor(Math.random() * names.length)];
-      const msg = document.createElement("p");
-      msg.textContent = `👤 ${name} ${action} (+${amount} Robux)`;
-      feed.prepend(msg);
-    }
-
-    // Auto-generate fake feed
-    setInterval(() => {
-      const actions = ["completed a task", "watched an ad", "claimed a bonus"];
-      const action = actions[Math.floor(Math.random() * actions.length)];
-      const amount = action === "completed a task" ? 10 : (action === "watched an ad" ? 1 : 5);
-      addFeed(action, amount);
-    }, 5000);
+    document.getElementById("adgemWall").src = 
+      "https://api.adgem.com/v1/wall?appid=31046&playerid=" + playerid;
   </script>
 </body>
 </html>
