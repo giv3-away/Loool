@@ -26,22 +26,24 @@
     .top-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
     }
-    .top-item img {
-      width: 24px;
-      height: 24px;
+    #robuxCounter {
+      font-size: 16px;
+      transition: transform 0.3s ease;
     }
-
-    /* Fake feed (centered text) */
-    #feed {
+    #robuxCounter.bump {
+      transform: scale(1.3);
+    }
+    #fakeFeed {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       font-size: 14px;
-      font-weight: normal;
-      display: none;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
     }
 
     /* Main content */
@@ -50,40 +52,91 @@
       text-align: center;
     }
 
-    .offer-title {
-      font-size: 18px;
-      font-weight: bold;
+    /* Sections */
+    #offerwall, #reward {
+      margin-top: 30px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+      animation: fadeIn 0.6s ease;
+    }
+    #offerwall h2, #reward h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
       color: #1446FF;
-      margin: 15px 0;
     }
 
-    /* Scrollable offers */
-    #offers {
-      max-height: 320px;
-      overflow-y: auto;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      text-align: left;
-    }
-    .offer {
-      padding: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ddd;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
+    /* Progress bar */
+    .progress-container {
+      background: #ddd;
+      border-radius: 20px;
       overflow: hidden;
-      text-overflow: ellipsis;
+      height: 20px;
+      margin: 15px 0;
     }
-    .offer:hover {
-      background: #f9f9f9;
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #1446FF;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .offer span {
-      font-weight: bold;
-      color: #1446FF;
-      margin-left: 6px;
+
+    /* Popup styles */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: #eee;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      text-align: center;
+      width: 300px;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .popup.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .popup textarea {
+      width: 90%;
+      padding: 8px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+    .popup button {
+      background: #1446FF;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.2s ease;
+    }
+    .popup button:hover {
+      transform: scale(1.05);
+    }
+    .popup .close-btn {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px);}
+      to { opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
@@ -92,86 +145,181 @@
   <!-- Top bar -->
   <header>
     <div class="top-item">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" alt="Robux">
-      <span id="robuxCounter">0</span>
+      <span id="robuxCounter">0</span> Robux
     </div>
-    <div id="feed"></div>
-    <div class="top-item">
-      <img src="https://cdn-icons-png.flaticon.com/512/2769/2769387.png" alt="Cash Out">
-      <span>Cash Out</span>
+    <span id="fakeFeed"></span>
+    <div class="top-item" onclick="openCashout()">
+      <span>Cashout</span>
     </div>
   </header>
 
   <!-- Main -->
   <main>
-    <h1>Welcome to Easy Robux</h1>
-    <p>Earn free Robux by completing simple tasks and offers.</p>
+    <!-- Offers -->
+    <section id="offerwall">
+      <h2>Offers</h2>
+      <!-- CPA Network Script Embed -->
+      <div id="offerList">
+        <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
+      </div>
+    </section>
 
-    <div class="offer-title">
-      Complete offers to earn 
-      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="18">
-    </div>
-    <div id="offers">
-      <p>Loading offers...</p>
-    </div>
+    <!-- Reward -->
+    <section id="reward">
+      <h2>Collect 50 Robux for a prize</h2>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <button id="rewardButton" style="display:none;" onclick="randomPrize()">💰</button>
+    </section>
   </main>
 
+  <!-- Popups -->
+  <div class="popup" id="popupError">
+    <span class="close-btn" onclick="closePopup('popupError')">✖</span>
+    <p>At least 1000 Robux</p>
+  </div>
+
+  <div class="popup" id="popupUsername">
+    <textarea placeholder="Username..."></textarea>
+    <button onclick="confirmUsername()">Confirm</button>
+  </div>
+
+  <div class="popup" id="popupAmount">
+    <textarea placeholder="Amount of Robux..."></textarea>
+    <button onclick="confirmAmount()">Confirm</button>
+  </div>
+
+  <div class="popup" id="popupSuccess">
+    <span class="close-btn" onclick="closePopup('popupSuccess')">✖</span>
+    <p id="successMessage"></p>
+    <small>Might take some time.</small>
+  </div>
+
+  <!-- Reward Popup -->
+  <div class="popup" id="popupReward">
+    <p id="rewardMessage"></p>
+    <button onclick="claimReward()">Claim</button>
+  </div>
+
   <script>
-    // Robux counter system (localStorage based)
+    // Robux counter
     let robux = parseInt(localStorage.getItem("robux") || "0");
 
-    function updateCounter() {
-      document.getElementById("robuxCounter").innerText = robux;
+    function animateNumber(el, start, end, duration = 600) {
+      const range = end - start;
+      const startTime = performance.now();
+      function step(currentTime) {
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        const value = Math.floor(start + range * progress);
+        el.innerText = value;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
 
-    updateCounter();
+    function updateCounter(bump=true) {
+      const counter = document.getElementById("robuxCounter");
+      const currentValue = parseInt(counter.innerText || "0");
+      animateNumber(counter, currentValue, robux, 800);
+      if(bump){
+        counter.classList.add("bump");
+        setTimeout(()=> counter.classList.remove("bump"),300);
+      }
+    }
+    updateCounter(false);
 
-    // Fake feed system
-    const feed = document.getElementById("feed");
-    const usernames = ["xXNoobSlayerXx", "CoolKid21", "ProBuilder", "Guest123", "PixelMaster", "GameOver99"];
-    
-    function showFeed() {
-      const user = usernames[Math.floor(Math.random() * usernames.length)];
-      const amount = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
-      feed.innerHTML = `${user} cashed out ${amount} <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Robux_2019_Logo_black.svg" width="14">`;
-      feed.style.display = "block";
-
-      setTimeout(() => {
-        feed.style.display = "none";
-      }, 5000); // disappears after 5s
+    // Progress bar
+    let progress = 0;
+    function updateProgress(amount) {
+      progress += amount;
+      if (progress >= 50) {
+        progress = 50;
+        document.getElementById("rewardButton").style.display = "inline-block";
+      }
+      document.getElementById("progressBar").style.width = (progress/50*100) + "%";
     }
 
-    setInterval(showFeed, 30000);
+    // Reward system
+    let pendingReward = 0;
+    function randomPrize() {
+      let prize = Math.floor(Math.random() * 11) + 10; // 10-20
+      pendingReward = prize;
+      document.getElementById("rewardMessage").innerText = "You won " + prize + " Robux";
+      showPopup("popupReward");
+      progress = 0;
+      document.getElementById("progressBar").style.width = "0%";
+      document.getElementById("rewardButton").style.display = "none";
+    }
+    function claimReward() {
+      robux += pendingReward;
+      localStorage.setItem("robux", robux);
+      updateCounter();
+      closePopup("popupReward");
+    }
 
-    // === Fetch CPA Grip Offers via Proxy ===
-    const offersDiv = document.getElementById("offers");
-    const proxy = "https://cors-anywhere.herokuapp.com/";
-    const feedUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
+    // Cashout system
+    let cashoutUsername = "";
+    function openCashout() {
+      if (robux < 1000) {
+        showPopup("popupError");
+      } else {
+        showPopup("popupUsername");
+      }
+    }
+    function confirmUsername() {
+      cashoutUsername = document.querySelector("#popupUsername textarea").value.trim();
+      if (cashoutUsername) {
+        closePopup("popupUsername");
+        showPopup("popupAmount");
+      }
+    }
+    function confirmAmount() {
+      let amount = parseInt(document.querySelector("#popupAmount textarea").value.trim());
+      if (!isNaN(amount) && amount > 0 && amount <= robux) {
+        robux -= amount;
+        localStorage.setItem("robux", robux);
+        updateCounter();
+        closePopup("popupAmount");
+        document.getElementById("successMessage").innerHTML = 
+          cashoutUsername + " cashed out " + amount + " Robux";
+        showPopup("popupSuccess");
+      }
+    }
 
-    fetch(proxy + feedUrl)
-      .then(res => res.json())
-      .then(data => {
-        offersDiv.innerHTML = "";
-        data.forEach(offer => {
-          let el = document.createElement("div");
-          el.className = "offer";
-          el.innerHTML = `${offer.offer_name} <span>+${offer.payout} Robux</span>`;
-          el.onclick = () => {
-            window.open(offer.show_url, "_blank");
-            // reward after returning
-            setTimeout(() => {
-              robux += parseInt(offer.payout);
-              localStorage.setItem("robux", robux);
-              updateCounter();
-            }, 5000); // simulate credit after 5s
-          };
-          offersDiv.appendChild(el);
-        });
-      })
-      .catch(err => {
-        offersDiv.innerHTML = "<p>Failed to load offers.</p>";
-        console.error(err);
-      });
+    // Popup show/hide with animations
+    function showPopup(id) {
+      const el = document.getElementById(id);
+      el.style.display = "block";
+      setTimeout(()=> el.classList.add("show"), 10);
+    }
+    function closePopup(id) {
+      const el = document.getElementById(id);
+      el.classList.remove("show");
+      setTimeout(()=> el.style.display="none", 300);
+    }
+
+    // Fake feed
+    const fakeFeed = document.getElementById("fakeFeed");
+    const baseWords = [
+      "moon","star","fire","wind","rock","sand","wave","tree","lion","frog",
+      "wolf","snow","rain","dark","void","dust","bird","iron","gold","lava"
+    ];
+    function randomUsername() {
+      let word = baseWords[Math.floor(Math.random() * baseWords.length)];
+      let letters = String.fromCharCode(97 + Math.floor(Math.random()*26)) +
+                    String.fromCharCode(97 + Math.floor(Math.random()*26));
+      return word + letters;
+    }
+    function showFakeFeed() {
+      let user = randomUsername();
+      let amount = Math.floor(Math.random() * 4001) + 1000; // 1000-5000
+      fakeFeed.innerHTML = user + " cashed out " + amount + " Robux";
+      fakeFeed.style.opacity = 1;
+      fakeFeed.style.transform = "translateX(-50%) translateY(0)";
+      setTimeout(()=>{ fakeFeed.style.opacity = 0; }, 5000);
+    }
+    setInterval(showFakeFeed, 15000); // every 15s
   </script>
 </body>
 </html>
