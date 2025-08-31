@@ -73,48 +73,6 @@
       color: #1446FF;
     }
 
-    /* Progress bar section */
-    #progressSection {
-      margin-top: 25px;
-      background: white;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      text-align: center;
-    }
-    #progressSection h2 {
-      font-size: 14px;
-      margin-bottom: 12px;
-      color: #1446FF;
-    }
-    .progress-container {
-      background: #ddd;
-      border-radius: 20px;
-      overflow: hidden;
-      height: 20px;
-      margin: 15px 0;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #1446FF;
-      transition: width 0.5s ease;
-    }
-    #rewardButton {
-      background: #1446FF;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      display: none;
-      transition: all 0.3s ease;
-    }
-    #rewardButton:hover {
-      transform: scale(1.05);
-    }
-
     /* Paragraph Section */
     #tipsSection {
       margin-top: 25px;
@@ -133,6 +91,26 @@
       font-size: 14px;
       color: #000;
       line-height: 1.6;
+    }
+
+    /* Prize Images */
+    #prizes {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .prize-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .prize-img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px gold;
     }
 
     /* Overlay + Popup */
@@ -171,27 +149,6 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
-    .popup textarea {
-      width: 90%;
-      padding: 8px;
-      margin: 10px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: none;
-    }
-    .popup button {
-      background: #1446FF;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: transform 0.2s ease;
-    }
-    .popup button:hover {
-      transform: scale(1.05);
-    }
     .popup .close-btn {
       position: absolute;
       top: 8px;
@@ -199,6 +156,7 @@
       font-size: 18px;
       cursor: pointer;
     }
+
     .roblox-btn {
       background: #1446FF;
       color: #fff;
@@ -232,7 +190,7 @@
 
   <!-- Main -->
   <main>
-    <!-- Tips (moved to top) -->
+    <!-- Tips -->
     <section id="tipsSection">
       <h2>Tips To Get More Robux Here</h2>
       <p>
@@ -243,21 +201,19 @@
       </p>
     </section>
 
+    <!-- Prize Images -->
+    <section id="prizes">
+      <img src="wheel.webp" alt="Prize Wheel" class="prize-img" onclick="showPopup('popupWheel')">
+      <img src="redgift.jpg" alt="Red Gift" class="prize-img" onclick="showPopup('popupRedGift')">
+      <img src="goldengift.jpeg" alt="Golden Gift" class="prize-img" onclick="showPopup('popupGoldenGift')">
+    </section>
+
     <!-- Offers -->
     <section id="offerwall">
       <h2>Complete Offers To Win Robux</h2>
       <div id="offerList">
         <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
       </div>
-    </section>
-
-    <!-- Progress -->
-    <section id="progressSection">
-      <h2>Complete 3 Offers And Win 300 Robux</h2>
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <button id="rewardButton" onclick="claimProgressReward()">Claim Reward</button>
     </section>
   </main>
 
@@ -282,6 +238,20 @@
   <div class="popup" id="popupWelcome">
     <p><b>Welcome to EazyRobux</b><br>Win Robux By Completing Easy Offers</p>
     <button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button>
+  </div>
+
+  <!-- Prize Popups -->
+  <div class="popup" id="popupWheel">
+    <span class="close-btn" onclick="closePopup('popupWheel')">✖</span>
+    <p>Complete 2 offers to unlock</p>
+  </div>
+  <div class="popup" id="popupRedGift">
+    <span class="close-btn" onclick="closePopup('popupRedGift')">✖</span>
+    <p>Complete 3 offers to unlock</p>
+  </div>
+  <div class="popup" id="popupGoldenGift">
+    <span class="close-btn" onclick="closePopup('popupGoldenGift')">✖</span>
+    <p>Complete 4 offers to unlock</p>
   </div>
 
   <script>
@@ -371,27 +341,6 @@
       setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
     setInterval(showFeed, 15000);
-
-    // Progress
-    let progress = parseInt(localStorage.getItem("progress") || "0");
-    function updateProgress() {
-      const bar = document.getElementById("progressBar");
-      bar.style.width = (progress/3*100) + "%";
-      if (progress >= 3) {
-        document.getElementById("rewardButton").style.display = "inline-block";
-      } else {
-        document.getElementById("rewardButton").style.display = "none";
-      }
-    }
-    updateProgress();
-    function claimProgressReward() {
-      robux += 300;
-      localStorage.setItem("robux", robux);
-      updateCounter();
-      progress = 0;
-      localStorage.setItem("progress", progress);
-      updateProgress();
-    }
 
     // Welcome popup
     if (!localStorage.getItem("welcomeShown")) {
