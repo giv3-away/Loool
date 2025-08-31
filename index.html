@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Easy Robux</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: #f5faff;
+      color: #333;
+      overflow: hidden;
+    }
+    /* Loader */
+    #loader {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #00A2FF, #007ACC);
+      color: white;
+      text-align: center;
+    }
+    #loader img {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      border-radius: 20%;
+      border: 3px solid white;
+    }
+    #loader h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    #loader p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    /* Main page */
+    #main {
+      display: none;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Robux top bar */
+    #robux-bar {
+      background: #00A2FF;
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    /* Content area */
+    #content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .btn {
+      background: #00A2FF;
+      border: none;
+      color: white;
+      padding: 18px 40px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.1s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .btn:hover {
+      background: #008cdd;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .note {
+      margin-top: 15px;
+      color: #555;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div id="loader">
+    <img src="logo.png" alt="Easy Robux Logo">
+    <h1>Easy Robux</h1>
+    <p>Get free Robux from simple tasks</p>
+  </div>
+
+  <!-- Main content -->
+  <div id="main">
+    <div id="robux-bar">Your Robux: <span id="robux-count">0</span></div>
+    <div id="content">
+      <button class="btn" onclick="watchAd()">🎬 Watch Ad to Earn Robux</button>
+      <p class="note">Each ad gives you +1 Robux</p>
+    </div>
+  </div>
+
+  <script>
+    // Load stored Robux
+    let robux = parseInt(localStorage.getItem("robux")) || 0;
+    document.getElementById("robux-count").textContent = robux;
+
+    // Simulate watching an ad
+    function watchAd() {
+      alert("Ad is playing... (simulate)");
+      robux++;
+      localStorage.setItem("robux", robux);
+      document.getElementById("robux-count").textContent = robux;
+    }
+
+    // Simulate loading screen
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('main').style.display = 'flex';
+      document.body.style.overflow = 'auto';
+    }, 2500);
+  </script>
+</body>
+</html>
