@@ -72,6 +72,39 @@
       color: #1446FF;
     }
 
+    /* Progress bar section */
+    #progressSection {
+      margin-top: 25px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .progress-container {
+      background: #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+      height: 20px;
+      margin: 15px 0;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #1446FF;
+      transition: width 0.5s ease;
+    }
+    #rewardButton {
+      background: #1446FF;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: none;
+    }
+
     /* Overlay + Popup */
     .overlay {
       position: fixed;
@@ -134,7 +167,7 @@
       cursor: pointer;
     }
     .roblox-btn {
-      background: #E00000;
+      background: #1446FF; /* Same as top bar */
       color: #fff;
       font-weight: bold;
       font-size: 16px;
@@ -174,12 +207,21 @@
         <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
       </div>
     </section>
+
+    <!-- Progress -->
+    <section id="progressSection">
+      <h2>Complete 3 Offers And Win 300 Robux</h2>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <button id="rewardButton" onclick="claimProgressReward()">Claim Reward</button>
+    </section>
   </main>
 
   <!-- Popups -->
   <div class="popup" id="popupError">
     <span class="close-btn" onclick="closePopup('popupError')">✖</span>
-    <p>At least 1000 Robux</p>
+    <p>At least 500 Robux</p>
   </div>
 
   <div class="popup" id="popupUsername">
@@ -195,7 +237,7 @@
   <div class="popup" id="popupSuccess">
     <span class="close-btn" onclick="closePopup('popupSuccess')">✖</span>
     <p id="successMessage"></p>
-    <small>It might take some time to receive the robux</small>
+    <small>It might take some time to receive the Robux.</small>
   </div>
 
   <!-- First-time welcome popup -->
@@ -242,7 +284,7 @@
     // Cashout
     let cashoutUsername = "";
     function openCashout() {
-      if (robux < 1000) {
+      if (robux < 500) {
         showPopup("popupError");
       } else {
         showPopup("popupUsername");
@@ -263,7 +305,7 @@
         updateCounter();
         closePopup("popupAmount");
         document.getElementById("successMessage").innerHTML = 
-          cashoutUsername + " cashed out " + amount + " Robux";
+          "You cashed out " + amount + " Robux";
         showPopup("popupSuccess");
       }
     }
@@ -282,17 +324,39 @@
       setTimeout(()=> el.style.display="none", 400);
     }
 
-    // Fake feed
+    // Fake feed (4-letter word + 2 digits, 50–100 Robux)
     const feed = document.getElementById("fakeFeed");
-    const usernames = ["xXNoobSlayerXx", "CoolKid21", "ProBuilder", "Guest123", "PixelMaster", "GameOver99"];
+    const words = ["wolf","star","moon","lava","rock","sand","rain","snow","fire","wind","leaf","iron","gold","aqua","dark","void","nova","opal","crux","zeta"];
     function showFeed() {
-      const user = usernames[Math.floor(Math.random() * usernames.length)];
-      const amount = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
-      feed.innerHTML = `${user} cashed out ${amount} Robux`;
+      const word = words[Math.floor(Math.random() * words.length)];
+      const num = Math.floor(Math.random()*90)+10; // two digits
+      const amount = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+      feed.innerHTML = `${word}${num} won ${amount} Robux!`;
       feed.style.opacity = 1;
       setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
-    setInterval(showFeed, 30000);
+    setInterval(showFeed, 20000);
+
+    // Progress (3 offers = 300 Robux)
+    let progress = parseInt(localStorage.getItem("progress") || "0");
+    function updateProgress() {
+      const bar = document.getElementById("progressBar");
+      bar.style.width = (progress/3*100) + "%";
+      if (progress >= 3) {
+        document.getElementById("rewardButton").style.display = "inline-block";
+      } else {
+        document.getElementById("rewardButton").style.display = "none";
+      }
+    }
+    updateProgress();
+    function claimProgressReward() {
+      robux += 300;
+      localStorage.setItem("robux", robux);
+      updateCounter();
+      progress = 0;
+      localStorage.setItem("progress", progress);
+      updateProgress();
+    }
 
     // Welcome popup on first visit
     if (!localStorage.getItem("welcomeShown")) {
