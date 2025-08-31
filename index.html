@@ -10,6 +10,7 @@
       margin: 0;
       background: #f2f5ff;
       color: #222;
+      overflow-y: scroll; /* force scrollbar */
     }
 
     /* Top bar */
@@ -45,7 +46,7 @@
       white-space: nowrap;
       opacity: 0;
       transition: opacity 1s ease-in-out, transform 0.6s ease-in-out;
-      color: #fff; /* White text inside top bar */
+      color: #fff;
     }
 
     /* Main */
@@ -82,7 +83,7 @@
     #progressSection h2 {
       font-size: 14px;
       margin-bottom: 12px;
-      color: #1446FF; /* Roblox blue */
+      color: #1446FF;
     }
     .progress-container {
       background: #ddd;
@@ -110,6 +111,26 @@
     }
     #rewardButton:hover {
       transform: scale(1.05);
+    }
+
+    /* Paragraph Section */
+    #tipsSection {
+      margin-top: 25px;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    #tipsSection h2 {
+      font-size: 18px;
+      color: #1446FF;
+      margin-bottom: 12px;
+    }
+    #tipsSection p {
+      font-size: 14px;
+      color: #000;
+      line-height: 1.6;
     }
 
     /* Overlay + Popup */
@@ -177,7 +198,7 @@
       cursor: pointer;
     }
     .roblox-btn {
-      background: #1446FF; /* Same as top bar */
+      background: #1446FF;
       color: #fff;
       font-weight: bold;
       font-size: 16px;
@@ -193,7 +214,7 @@
 </head>
 <body>
 
-  <!-- Overlay for blocking clicks -->
+  <!-- Overlay -->
   <div id="overlay" class="overlay"></div>
 
   <!-- Top bar -->
@@ -213,7 +234,6 @@
     <section id="offerwall">
       <h2>Complete Offers To Win Robux</h2>
       <div id="offerList">
-        <!-- CPA Network Script Embed -->
         <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
       </div>
     </section>
@@ -226,6 +246,18 @@
       </div>
       <button id="rewardButton" onclick="claimProgressReward()">Claim Reward</button>
     </section>
+
+    <!-- Tips -->
+    <section id="tipsSection">
+      <h2>Tips To Get More Robux</h2>
+      <p>
+        Want more Robux fast? Always follow the steps of each offer carefully.  
+        Use real info on surveys so they count.  
+        When downloading apps, open them and click around for a bit so it tracks.  
+        Check back often—new offers show up every day!  
+        Don’t rush, take your time and complete them right for the reward.  
+      </p>
+    </section>
   </main>
 
   <!-- Popups -->
@@ -233,36 +265,29 @@
     <span class="close-btn" onclick="closePopup('popupError')">✖</span>
     <p>At least 500 Robux</p>
   </div>
-
   <div class="popup" id="popupUsername">
     <textarea placeholder="Username..."></textarea>
     <button onclick="confirmUsername()">Confirm</button>
   </div>
-
   <div class="popup" id="popupAmount">
     <textarea placeholder="Amount of Robux..."></textarea>
     <button onclick="confirmAmount()">Confirm</button>
   </div>
-
   <div class="popup" id="popupSuccess">
     <span class="close-btn" onclick="closePopup('popupSuccess')">✖</span>
     <p id="successMessage"></p>
     <small>It might take some time to receive the Robux.</small>
   </div>
-
-  <!-- First-time welcome popup -->
   <div class="popup" id="popupWelcome">
     <p><b>Welcome to EazyRobux</b><br>Win Robux By Completing Easy Offers</p>
     <button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button>
   </div>
 
   <script>
-    // === Anti-cheat (disable inspect tools) ===
+    // === Anti-cheat ===
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.onkeydown = function(e) {
-      if (e.keyCode == 123 || 
-          (e.ctrlKey && e.shiftKey && ['I','C','J'].includes(e.key.toUpperCase())) ||
-          (e.ctrlKey && e.key.toLowerCase() === 'u')) {
+      if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && ['I','C','J'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
         e.preventDefault();
         return false;
       }
@@ -314,8 +339,7 @@
         localStorage.setItem("robux", robux);
         updateCounter();
         closePopup("popupAmount");
-        document.getElementById("successMessage").innerHTML = 
-          "You cashed out " + amount + " Robux";
+        document.getElementById("successMessage").innerHTML = "You cashed out " + amount + " Robux";
         showPopup("popupSuccess");
       }
     }
@@ -334,7 +358,7 @@
       setTimeout(()=> el.style.display="none", 400);
     }
 
-    // Fake feed (4-letter word + 2 digits, 50–100 Robux)
+    // Fake feed
     const feed = document.getElementById("fakeFeed");
     const words = ["wolf","star","moon","lava","rock","sand","rain","snow","fire","wind","leaf","iron","gold","aqua","dark","void","nova","opal","crux","zeta"];
     function showFeed() {
@@ -343,12 +367,11 @@
       const amount = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
       feed.innerHTML = `${word}${num} won ${amount} Robux!`;
       feed.style.opacity = 1;
-      feed.style.transform = "translateX(-50%) translateY(0)";
       setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
     setInterval(showFeed, 15000);
 
-    // Progress (3 offers = 300 Robux)
+    // Progress
     let progress = parseInt(localStorage.getItem("progress") || "0");
     function updateProgress() {
       const bar = document.getElementById("progressBar");
