@@ -23,7 +23,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: linear-gradient(135deg, #00A2FF, #007ACC);
+      background: linear-gradient(135deg, #1446FF, #0f34b0);
       color: white;
       text-align: center;
     }
@@ -49,28 +49,59 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-    }
-    /* Robux top bar */
-    #robux-bar {
-      background: #00A2FF;
-      color: white;
-      padding: 15px;
-      font-size: 1.2rem;
-      text-align: center;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    /* Content area */
-    #content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
+    }
+    /* Side icons */
+    #side-left, #side-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #side-left {
+      left: 15px;
+    }
+    #side-right {
+      right: 15px;
+    }
+    .side-btn {
+      display: flex;
+      align-items: center;
+      background: #1446FF;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .side-btn img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    .robux-counter {
+      display: flex;
+      align-items: center;
+      background: #1446FF;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .robux-counter img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    /* Center content */
+    #content {
       text-align: center;
     }
     .btn {
-      background: #00A2FF;
+      background: #1446FF;
       border: none;
       color: white;
       padding: 18px 40px;
@@ -82,7 +113,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     .btn:hover {
-      background: #008cdd;
+      background: #1037c9;
     }
     .btn:active {
       transform: scale(0.97);
@@ -105,7 +136,22 @@
 
   <!-- Main content -->
   <div id="main">
-    <div id="robux-bar">Your Robux: <span id="robux-count">0</span></div>
+    <!-- Left: Redeem button -->
+    <div id="side-left">
+      <div class="side-btn" onclick="cashOut()">
+        <img src="redeem.png" alt="Redeem"> Redeem
+      </div>
+    </div>
+
+    <!-- Right: Robux counter -->
+    <div id="side-right">
+      <div class="robux-counter">
+        <img src="robux.png" alt="Robux">
+        <span id="robux-count">0</span>
+      </div>
+    </div>
+
+    <!-- Center content -->
     <div id="content">
       <button class="btn" onclick="watchAd()">🎬 Watch Ad to Earn Robux</button>
       <p class="note">Each ad gives you +1 Robux</p>
@@ -125,7 +171,12 @@
       document.getElementById("robux-count").textContent = robux;
     }
 
-    // Simulate loading screen
+    // Simulate redeem
+    function cashOut() {
+      alert("Cashout request submitted! (simulate)");
+    }
+
+    // Loading screen transition
     setTimeout(() => {
       document.getElementById('loader').style.display = 'none';
       document.getElementById('main').style.display = 'flex';
