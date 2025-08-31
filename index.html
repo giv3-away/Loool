@@ -22,6 +22,7 @@
       padding: 12px 20px;
       font-weight: bold;
       position: relative;
+      overflow: hidden;
     }
     .top-item {
       display: flex;
@@ -43,11 +44,8 @@
       font-size: 14px;
       white-space: nowrap;
       opacity: 0;
-      transition: opacity 1s ease-in-out;
-      background: #fff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      transition: opacity 1s ease-in-out, transform 0.6s ease-in-out;
+      color: #fff; /* White text inside top bar */
     }
 
     /* Main */
@@ -81,6 +79,11 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: center;
     }
+    #progressSection h2 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #1446FF; /* Roblox blue */
+    }
     .progress-container {
       background: #ddd;
       border-radius: 20px;
@@ -103,6 +106,10 @@
       cursor: pointer;
       font-size: 14px;
       display: none;
+      transition: all 0.3s ease;
+    }
+    #rewardButton:hover {
+      transform: scale(1.05);
     }
 
     /* Overlay + Popup */
@@ -113,9 +120,12 @@
       background: rgba(0,0,0,0.4);
       z-index: 999;
       display: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
     .overlay.active {
       display: block;
+      opacity: 1;
     }
     .popup {
       position: fixed;
@@ -250,7 +260,7 @@
     // === Anti-cheat (disable inspect tools) ===
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.onkeydown = function(e) {
-      if (e.keyCode == 123 || // F12
+      if (e.keyCode == 123 || 
           (e.ctrlKey && e.shiftKey && ['I','C','J'].includes(e.key.toUpperCase())) ||
           (e.ctrlKey && e.key.toLowerCase() === 'u')) {
         e.preventDefault();
@@ -310,7 +320,7 @@
       }
     }
 
-    // Popups (block background)
+    // Popups
     function showPopup(id) {
       document.getElementById("overlay").classList.add("active");
       const el = document.getElementById(id);
@@ -329,13 +339,14 @@
     const words = ["wolf","star","moon","lava","rock","sand","rain","snow","fire","wind","leaf","iron","gold","aqua","dark","void","nova","opal","crux","zeta"];
     function showFeed() {
       const word = words[Math.floor(Math.random() * words.length)];
-      const num = Math.floor(Math.random()*90)+10; // two digits
+      const num = Math.floor(Math.random()*90)+10;
       const amount = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
       feed.innerHTML = `${word}${num} won ${amount} Robux!`;
       feed.style.opacity = 1;
+      feed.style.transform = "translateX(-50%) translateY(0)";
       setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
-    setInterval(showFeed, 20000);
+    setInterval(showFeed, 15000);
 
     // Progress (3 offers = 300 Robux)
     let progress = parseInt(localStorage.getItem("progress") || "0");
@@ -358,7 +369,7 @@
       updateProgress();
     }
 
-    // Welcome popup on first visit
+    // Welcome popup
     if (!localStorage.getItem("welcomeShown")) {
       setTimeout(()=> showPopup("popupWelcome"), 500);
       localStorage.setItem("welcomeShown", "true");
