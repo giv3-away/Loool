@@ -5,212 +5,230 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Easy Robux</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
     body {
-      background: #f5faff;
-      color: #333;
-    }
-    /* Loader */
-    #loader {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #1446FF, #0f34b0);
-      color: white;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f7ff;
+      color: #222;
       text-align: center;
     }
-    #loader img {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 20px;
-      border-radius: 20%;
-      border: 3px solid white;
-    }
-    #loader h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    #loader p {
-      opacity: 0.9;
-      font-size: 1.1rem;
-    }
-    /* Main */
-    #main {
-      display: none;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+
     /* Top bar */
-    #top-bar {
-      background: #1446FF;
+    .topbar {
+      background-color: #1446FF;
       color: white;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 20px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
     }
-    .cashout-btn, .robux-counter {
+    .topbar .cashout, .topbar .balance {
       display: flex;
       align-items: center;
+      gap: 8px;
       font-weight: bold;
-      cursor: pointer;
     }
-    .cashout-btn img, .robux-counter img {
+    .topbar img {
       width: 24px;
       height: 24px;
-      margin-right: 8px;
     }
-    /* Center content */
-    #content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .btn {
-      background: #1446FF;
-      border: none;
-      color: white;
-      padding: 18px 40px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: bold;
-      transition: background 0.3s ease, transform 0.1s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-    .btn:hover {
-      background: #1037c9;
-    }
-    .btn:active {
-      transform: scale(0.97);
-    }
-    .note {
-      margin-top: 15px;
-      color: #555;
-      font-size: 0.9rem;
-    }
-    /* Tasks section */
-    #tasks {
+
+    /* Main content */
+    .container {
       padding: 20px;
-      background: #fff;
-      box-shadow: 0 -3px 8px rgba(0,0,0,0.08);
-      border-top: 2px solid #eee;
     }
-    #tasks h2 {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-      color: #1446FF;
-    }
-    .task {
-      background: #f1f4ff;
-      border: 1px solid #d6ddff;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .task button {
+    .watch-btn {
       background: #1446FF;
       color: white;
       border: none;
-      padding: 8px 14px;
       border-radius: 8px;
+      font-size: 20px;
+      padding: 15px 40px;
       cursor: pointer;
-      font-size: 0.9rem;
+      margin: 20px 0;
+      transition: 0.2s;
     }
-    .task button:hover {
-      background: #1037c9;
+    .watch-btn:hover {
+      background: #0e34c1;
+    }
+
+    .tasks {
+      margin: 20px 0;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Daily bonus */
+    .daily-bonus {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .bonus-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .bonus-btn:disabled {
+      background: grey;
+      cursor: not-allowed;
+    }
+
+    /* Unlockable prize */
+    .unlockable {
+      margin: 20px 0;
+      text-align: left;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .progress {
+      width: 100%;
+      background: #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 20px;
+      margin-top: 10px;
+    }
+    .progress-bar {
+      background: #1446FF;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* Activity feed */
+    .feed {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: left;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    footer {
+      margin: 30px 0;
+      color: #777;
     }
   </style>
 </head>
 <body>
-
-  <!-- Loader -->
-  <div id="loader">
-    <img src="logo.png" alt="Easy Robux Logo">
-    <h1>Easy Robux</h1>
-    <p>Get free Robux from simple tasks</p>
-  </div>
-
-  <!-- Main -->
-  <div id="main">
-
-    <!-- Top bar -->
-    <div id="top-bar">
-      <!-- Cashout left -->
-      <div class="cashout-btn" onclick="cashOut()">
-        <img src="redeem.png" alt="Redeem"> Cashout
-      </div>
-      <!-- Robux counter right -->
-      <div class="robux-counter">
-        <img src="robux.png" alt="Robux">
-        <span id="robux-count">0</span>
-      </div>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="cashout">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/money-bag.png"/>
+      Cash Out
     </div>
-
-    <!-- Center content -->
-    <div id="content">
-      <button class="btn" onclick="watchAd()">🎬 Watch Ad to Earn Robux</button>
-      <p class="note">Each ad gives you +1 Robux</p>
-    </div>
-
-    <!-- Tasks Section -->
-    <div id="tasks">
-      <h2>💡 Extra Tasks (CPA/CPI)</h2>
-      <div class="task">
-        <span>Download and open GameX</span>
-        <button>Do Task</button>
-      </div>
-      <div class="task">
-        <span>Complete a short survey</span>
-        <button>Do Task</button>
-      </div>
-      <div class="task">
-        <span>Install AppY and reach level 3</span>
-        <button>Do Task</button>
-      </div>
+    <div class="balance">
+      <span id="robuxAmount">0</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Robux_2019_Logo_black.svg"/>
     </div>
   </div>
+
+  <!-- Main container -->
+  <div class="container">
+    <button class="watch-btn" onclick="watchAd()">▶ Watch Ad</button>
+
+    <div class="tasks">
+      <h3>📋 Complete Tasks</h3>
+      <p>(CPA/CPI offers will go here)</p>
+    </div>
+
+    <div class="daily-bonus">
+      <h3>🎁 Daily Bonus</h3>
+      <button id="bonusBtn" class="bonus-btn" onclick="claimBonus()">Claim +5 Robux</button>
+    </div>
+
+    <div class="unlockable">
+      <h3>🔓 Unlockable Prize at 100 Robux</h3>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="feed" id="feed">
+      <h3>⚡ Live Activity</h3>
+    </div>
+  </div>
+
+  <footer>
+    Easy Robux © 2025
+  </footer>
 
   <script>
-    // Load stored Robux
+    // Robux amount tracking
     let robux = parseInt(localStorage.getItem("robux")) || 0;
-    document.getElementById("robux-count").textContent = robux;
+    const robuxDisplay = document.getElementById("robuxAmount");
+    const progressBar = document.getElementById("progressBar");
+    robuxDisplay.textContent = robux;
+    updateProgress();
 
-    // Simulate watching an ad
-    function watchAd() {
-      alert("Ad is playing... (simulate)");
-      robux++;
+    function addRobux(amount) {
+      robux += amount;
       localStorage.setItem("robux", robux);
-      document.getElementById("robux-count").textContent = robux;
+      robuxDisplay.textContent = robux;
+      updateProgress();
     }
 
-    // Simulate redeem
-    function cashOut() {
-      alert("Cashout request submitted! (simulate)");
+    function watchAd() {
+      addRobux(1); // +1 per ad (placeholder)
+      addFeed("watched an ad", 1);
     }
 
-    // Loading screen transition
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('main').style.display = 'flex';
-      document.body.style.overflow = 'auto';
-    }, 2500);
+    // Daily bonus logic
+    const bonusBtn = document.getElementById("bonusBtn");
+    const lastBonus = localStorage.getItem("lastBonus");
+
+    function claimBonus() {
+      const today = new Date().toDateString();
+      localStorage.setItem("lastBonus", today);
+      addRobux(5);
+      bonusBtn.disabled = true;
+      bonusBtn.textContent = "Already claimed today";
+      addFeed("claimed daily bonus", 5);
+    }
+
+    if (lastBonus === new Date().toDateString()) {
+      bonusBtn.disabled = true;
+      bonusBtn.textContent = "Already claimed today";
+    }
+
+    // Progress bar
+    function updateProgress() {
+      const percent = Math.min((robux / 100) * 100, 100);
+      progressBar.style.width = percent + "%";
+    }
+
+    // Fake activity feed
+    const feed = document.getElementById("feed");
+    const names = ["Player123", "NoobMaster", "EpicGamer", "CoolKid", "Guest001", "ProRobloxer"];
+    function addFeed(action, amount) {
+      const name = names[Math.floor(Math.random() * names.length)];
+      const msg = document.createElement("p");
+      msg.textContent = `👤 ${name} ${action} (+${amount} Robux)`;
+      feed.prepend(msg);
+    }
+
+    // Auto-generate fake feed
+    setInterval(() => {
+      const actions = ["completed a task", "watched an ad", "claimed a bonus"];
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      const amount = action === "completed a task" ? 10 : (action === "watched an ad" ? 1 : 5);
+      addFeed(action, amount);
+    }, 5000);
   </script>
 </body>
 </html>
