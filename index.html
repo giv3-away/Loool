@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="google" content="notranslate">
+  <meta name="googlebot" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EazyRobux</title>
   <style>
@@ -11,6 +14,11 @@
       background: #f2f5ff;
       color: #222;
     }
+
+    /* Try to suppress Google Translate UI if injected */
+    .notranslate, body, html { translate: no; }
+    #goog-gt-tt, .goog-te-banner-frame, .goog-te-gadget { display: none !important; }
+    body { top: 0 !important; }
 
     /* Top bar */
     header {
@@ -134,7 +142,7 @@
     }
   </style>
 </head>
-<body>
+<body class="notranslate" translate="no">
 
   <!-- Overlay -->
   <div id="overlay" class="overlay"></div>
@@ -151,7 +159,7 @@
   </header>
 
   <!-- Main -->
-  <main>
+  <main class="notranslate" translate="no">
     <!-- Prize Images -->
     <section id="prizes">
       <img src="100robux.jpeg" alt="100 Robux" class="prize-img" onclick="showPopup('popup100')">
@@ -198,24 +206,62 @@
   <div class="popup" id="popup400"><span class="close-btn" onclick="closePopup('popup400')">✖</span><p>Complete 7 offers to unlock</p></div>
 
   <script>
+    // =======================
+    // Persistent Robux balance with tamper check
+    // =======================
     const robuxCounter = document.getElementById("robuxCounter");
-    let robux = parseInt(localStorage.getItem("robux") || "0", 10);
+    const ROBUX_KEY = "robux";
+    const ROBUX_SIG_KEY = "robux_sig";
+    const ROBUX_SALT = "ezr_static_salt_v1_please_do_not_modify"; // used for simple integrity check
+
+    let robux = parseInt(localStorage.getItem(ROBUX_KEY) || "0", 10);
 
     function updateRobuxDisplay() {
       robuxCounter.textContent = robux;
     }
 
-    function addRobux(amount) {
+    async function sha256(text) {
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      const arr = Array.from(new Uint8Array(buf));
+      return arr.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function signValue(val) {
+      return sha256(ROBUX_SALT + ":" + String(val));
+    }
+
+    async function verifyRobuxIntegrity() {
+      const sig = localStorage.getItem(ROBUX_SIG_KEY) || "";
+      const expected = await signValue(robux);
+      if (sig !== expected) {
+        // reset on mismatch
+        robux = 0;
+        localStorage.setItem(ROBUX_KEY, String(robux));
+        localStorage.setItem(ROBUX_SIG_KEY, await signValue(robux));
+      }
+      updateRobuxDisplay();
+    }
+
+    async function persistRobux() {
+      localStorage.setItem(ROBUX_KEY, String(robux));
+      localStorage.setItem(ROBUX_SIG_KEY, await signValue(robux));
+    }
+
+    async function addRobux(amount) {
+      if (typeof amount !== "number" || !isFinite(amount)) return;
       robux += amount;
-      localStorage.setItem("robux", robux);
+      await persistRobux();
       updateRobuxDisplay();
       robuxCounter.classList.add("bump");
       setTimeout(() => robuxCounter.classList.remove("bump"), 500);
     }
 
-    updateRobuxDisplay();
+    verifyRobuxIntegrity();
 
+    // =======================
     // Fake feed
+    // =======================
     const fakeFeed = document.getElementById("fakeFeed");
     const words = ["wolf","star","moon","fire","cool","game","epic","dark","hero","play","luck","gold","ruby","iron","snow","wind","tree","frog","lion","bear"];
     const robuxAmounts = [100,150,200,250,300,400];
@@ -233,7 +279,9 @@
     }
     setInterval(showFakeFeed, 15000);
 
+    // =======================
     // Popups
+    // =======================
     function showPopup(id) {
       document.getElementById("overlay").classList.add("active");
       document.getElementById(id).classList.add("show");
@@ -243,9 +291,26 @@
       document.getElementById(id).classList.remove("show");
     }
 
-    function claimWelcome() {
+    function openCashout() {
+      if (robux < 500) {
+        showPopup("popupError");
+      } else {
+        showPopup("popupUsername");
+      }
+    }
+    function confirmUsername() {
+      closePopup("popupUsername");
+      showPopup("popupAmount");
+    }
+    function confirmAmount() {
+      closePopup("popupAmount");
+      document.getElementById("successMessage").textContent = `Successfully requested ${robux} Robux!`;
+      showPopup("popupSuccess");
+    }
+
+    async function claimWelcome() {
       if (!localStorage.getItem("welcomeClaimed")) {
-        addRobux(100);
+        await addRobux(100);
         localStorage.setItem("welcomeClaimed", "true");
       }
       closePopup("popupWelcome");
@@ -254,7 +319,9 @@
       showPopup("popupWelcome");
     }
 
-    // Perfect Offers Section
+    // =======================
+    // Perfect Offers Section (as requested)
+    // =======================
     const offerList = document.getElementById("offerList");
     const offersUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
 
@@ -329,6 +396,94 @@
         console.error("Fetch error:", err);
         offerList.innerHTML = "<p>Offers could not be loaded.</p>";
       });
+
+    // =======================
+    // Anti-translate hardening (runtime)
+    // =======================
+    (function preventAutoTranslate() {
+      // Force language to English in case user agent tries to hint otherwise
+      try {
+        document.documentElement.setAttribute("lang", "en");
+        document.documentElement.setAttribute("translate", "no");
+        document.body.setAttribute("translate", "no");
+        document.body.classList.add("notranslate");
+      } catch(e) {}
+
+      // Remove any injected Google Translate nodes if they appear
+      const killTranslate = () => {
+        const ids = ["goog-gt-tt"];
+        const classes = ["goog-te-banner-frame", "goog-te-gadget"];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        });
+        classes.forEach(cls => {
+          document.querySelectorAll("." + cls).forEach(el => el.remove());
+        });
+      };
+      const mo = new MutationObserver(killTranslate);
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      killTranslate();
+    })();
+
+    // =======================
+    // Anti-cheat hardening (client-side best-effort)
+    // =======================
+    (function antiCheat() {
+      // Block common shortcuts for devtools & source viewing
+      window.addEventListener("keydown", (e) => {
+        const k = e.key.toLowerCase();
+        if (
+          k === "f12" ||
+          (e.ctrlKey && e.shiftKey && (k === "i" || k === "j" || k === "c")) ||
+          (e.ctrlKey && (k === "u" || k === "s"))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }, { capture: true });
+
+      // Disable right-click and basic copy/paste/select (easy to bypass but stops casual users)
+      window.addEventListener("contextmenu", e => { e.preventDefault(); });
+      ["copy","cut","paste","selectstart","dragstart"].forEach(evt =>
+        window.addEventListener(evt, e => { e.preventDefault(); }, { capture: true })
+      );
+
+      // DevTools detection (viewport delta & timing trap)
+      let devtoolsOpen = false;
+      function checkDevtools() {
+        const threshold = 140;
+        const widthExposed = Math.abs(window.outerWidth - window.innerWidth) > threshold;
+        const heightExposed = Math.abs(window.outerHeight - window.innerHeight) > threshold;
+
+        const start = performance.now();
+        debugger; // timing trap
+        const time = performance.now() - start;
+
+        devtoolsOpen = widthExposed || heightExposed || time > 50;
+
+        if (devtoolsOpen) {
+          // If detected, clear progress signature (prevents easy tampering) and warn
+          localStorage.removeItem(ROBUX_SIG_KEY);
+          alert("Developer tools detected. For security, progress verification has been reset.");
+          // Optional: reload to restore clean state
+          location.reload();
+        }
+      }
+      setInterval(checkDevtools, 2000);
+
+      // Lock down console object a bit (still bypassable)
+      try {
+        Object.defineProperty(window, "console", {
+          get() {
+            checkDevtools();
+            return {};
+          },
+          set() {}
+        });
+      } catch(e) {}
+    })();
   </script>
 </body>
 </html>
