@@ -337,6 +337,14 @@
         console.error("Fetch error:", err);
         offerList.innerHTML = "<p>Offers could not be loaded.</p>";
       });
+
+    // === Welcome Popup only on first visit ===
+    window.onload = () => {
+      if (!localStorage.getItem("welcomeShown")) {
+        showPopup("popupWelcome");
+        localStorage.setItem("welcomeShown", "true");
+      }
+    };
   </script>
 </body>
 </html>
