@@ -75,6 +75,16 @@
     .offer-desc {
       font-size: 13px;
       color: #000;
+      margin-bottom: 10px;
+    }
+    .offer-reward {
+      background: #666;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
     }
 
     /* Tips section */
@@ -176,6 +186,10 @@
     <span class="close-btn" onclick="closePopup('popupError')">✖</span>
     <p>At least 500 Robux</p>
   </div>
+  <div class="popup" id="popupNotEnough">
+    <span class="close-btn" onclick="closePopup('popupNotEnough')">✖</span>
+    <p id="notEnoughMessage"></p>
+  </div>
   <div class="popup" id="popupUsername">
     <textarea placeholder="Roblox username..."></textarea>
     <button class="roblox-btn" onclick="confirmUsername()">Confirm</button>
@@ -256,7 +270,13 @@
     }
     function confirmAmount() {
       let amount = parseInt(document.querySelector("#popupAmount textarea").value.trim());
-      if (!isNaN(amount) && amount > 0 && amount <= robux) {
+      if (!isNaN(amount) && amount > 0) {
+        if (amount > robux) {
+          closePopup("popupAmount");
+          document.getElementById("notEnoughMessage").innerText = "You only have " + robux + " Robux";
+          showPopup("popupNotEnough");
+          return;
+        }
         robux -= amount;
         localStorage.setItem("robux", robux);
         updateCounter();
@@ -312,12 +332,14 @@
     fetch(offersUrl)
       .then(res => res.json())
       .then(data => {
-        data.offers.slice(0, 12).forEach(o => {
+        data.offers.forEach(o => {
+          let reward = (parseFloat(o.payout) * 100).toFixed(0);
           let card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `
             <div class="offer-title">${o.title || "Untitled Offer"}</div>
             <div class="offer-desc">${o.description || "Complete this offer to earn rewards!"}</div>
+            <div class="offer-reward">+${reward} Robux</div>
           `;
           card.onclick = () => { window.open(o.offerlink, "_blank"); };
           offerList.appendChild(card);
