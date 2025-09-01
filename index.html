@@ -224,11 +224,11 @@
     function showFakeFeed() {
       const user = randomUsername();
       const amount = robuxAmounts[Math.floor(Math.random() * robuxAmounts.length)];
-      fakeFeed.textContent = `${user} just earned ${amount} Robux!`;
+      fakeFeed.textContent = `${user} won ${amount} Robux`;
       fakeFeed.classList.add("show");
       setTimeout(() => fakeFeed.classList.remove("show"), 5000);
     }
-    setInterval(showFakeFeed, 7000);
+    setInterval(showFakeFeed, 15000);
 
     // === Overlay & Popups ===
     function showPopup(id) {
