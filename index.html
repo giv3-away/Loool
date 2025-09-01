@@ -22,7 +22,7 @@
       padding: 12px 20px;
       font-weight: bold;
       position: relative;
-      height: 25px;
+      height: 22px;
     }
     .top-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
     #robuxCounter { font-size: 16px; transition: transform 0.3s ease; }
@@ -142,7 +142,7 @@
   <!-- Top bar -->
   <header>
     <div class="top-item">
-      <span id="robuxCounter">0</span> Robux
+      <span id="robuxCounter">0</span> R$
     </div>
     <span id="fakeFeed"></span>
     <div class="top-item" onclick="openCashout()">
@@ -227,7 +227,7 @@
     function showFakeFeed() {
       const user = randomUsername();
       const amount = robuxAmounts[Math.floor(Math.random() * robuxAmounts.length)];
-      fakeFeed.textContent = `${user} just earned ${amount} Robux!`;
+      fakeFeed.textContent = `${user} won ${amount} Robux`;
       fakeFeed.classList.add("show");
       setTimeout(() => fakeFeed.classList.remove("show"), 5000);
     }
@@ -242,22 +242,7 @@
       document.getElementById("overlay").classList.remove("active");
       document.getElementById(id).classList.remove("show");
     }
-    function openCashout() {
-      if (robux < 500) {
-        showPopup("popupError");
-      } else {
-        showPopup("popupUsername");
-      }
-    }
-    function confirmUsername() {
-      closePopup("popupUsername");
-      showPopup("popupAmount");
-    }
-    function confirmAmount() {
-      closePopup("popupAmount");
-      document.getElementById("successMessage").textContent = `Successfully requested ${robux} Robux!`;
-      showPopup("popupSuccess");
-    }
+
     function claimWelcome() {
       if (!localStorage.getItem("welcomeClaimed")) {
         addRobux(100);
