@@ -69,30 +69,16 @@
       transform: scale(1.03);
       box-shadow: 0 0 12px rgba(0,0,0,0.2);
     }
-    .offer-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+    .offer-desc {
+      font-size: 14px;
+      color: #000;
     }
     .offer-reward {
-      background: #666;
-      color: #fff;
-      font-size: 14px;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
-    }
-    .offer-title {
-      font-size: 16px;
-      font-weight: bold;
+      margin-top: 6px;
+      text-align: right;
       color: #1446FF;
-    }
-    .offer-desc {
-      font-size: 13px;
-      color: #000;
-      margin-top: 4px;
+      font-weight: bold;
+      font-size: 14px;
     }
 
     /* Tips section */
@@ -211,8 +197,8 @@
         data.offers.forEach(o => {
           let reward = (parseFloat(o.payout) * 100).toFixed(0);
 
-          // Hardcoded texts for every offer_type
-          let desc = "📲 Complete this offer to earn rewards!";
+          // Hardcoded texts ONLY by offer_type (no fallback text!)
+          let desc = "";
           if (o.offer_type) {
             switch (o.offer_type.toLowerCase()) {
               case "survey": desc = "📝 Answer a quick survey to win!"; break;
@@ -235,14 +221,14 @@
             }
           }
 
+          // Skip offers with no known type
+          if (!desc) return;
+
           let card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `
-            <div class="offer-top">
-              <div class="offer-title">${o.title || "Untitled Offer"}</div>
-              <div class="offer-reward">+${reward} Robux</div>
-            </div>
             <div class="offer-desc">${desc}</div>
+            <div class="offer-reward">+${reward} Robux</div>
           `;
           card.onclick = () => { window.open(o.offerlink, "_blank"); };
           offerList.appendChild(card);
