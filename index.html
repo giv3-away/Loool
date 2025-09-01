@@ -28,7 +28,7 @@
     #robuxCounter { font-size: 16px; transition: transform 0.3s ease; }
     #robuxCounter.bump { transform: scale(1.3); }
 
-    /* Fake feed (centered both ways) */
+    /* Fake feed */
     #fakeFeed {
       position: absolute;
       top: 50%;
@@ -79,12 +79,9 @@
       transform: scale(1.04);
       box-shadow: 0 0 14px rgba(0,0,0,0.25);
     }
-    .offer-desc {
-      font-size: 16px;
-      color: #000;
-    }
+    .offer-desc { font-size: 16px; color: #000; }
 
-    /* Tips section */
+    /* Tips */
     #tipsSection {
       margin-top: 25px;
       background: white;
@@ -280,45 +277,8 @@
     const offerList = document.getElementById("offerList");
     const offersUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
 
-    const TYPE_TEXT = new Map([
-      ["survey", "📝 Answer a quick survey to win!"],
-      ["app install", "📲 Install this app and open it to earn rewards!"],
-      ["mobile install", "📲 Install this app on your phone and open it to earn rewards!"],
-      ["signup", "✍️ Sign up with real info to complete!"],
-      ["pin submit", "📞 Enter your phone number to finish!"],
-      ["sms", "📞 Enter your phone number to finish!"],
-      ["email submit", "📧 Enter your email to unlock rewards!"],
-      ["email/zip submit", "📧 Enter your email or ZIP to unlock rewards!"],
-      ["credit card submit", "💳 Enter your card details to finish registration!"],
-      ["download", "⬇️ Download the file and open it to complete!"],
-      ["soi", "✅ Confirm your email (Single Opt-In) to finish!"],
-      ["doi", "✅ Double confirm your email to complete (Double Opt-In)!"],
-      ["sweepstakes", "🎁 Enter the sweepstakes for a chance to win!"],
-      ["quiz", "❓ Complete this fun quiz to unlock rewards!"],
-      ["registration", "🖊️ Register on the site to complete the task!"],
-      ["purchase", "🛒 Make a purchase to finish this offer!"],
-      ["free trial", "🎟️ Sign up for a free trial to unlock rewards!"],
-      ["mobile subscription", "📱 Subscribe on mobile to complete!"],
-      ["desktop software", "💻 Install the desktop software to finish!"],
-      ["extension install", "🧩 Install the browser extension to earn!"],
-    ]);
-
-    function normalizeType(raw) {
-      if (!raw) return "";
-      let key = raw.toLowerCase().trim();
-      if (key.includes("app install") || key.includes("mobile install")) return "mobile install";
-      if (key.includes("pin") || key.includes("sms")) return "pin submit";
-      if (key.includes("email") && key.includes("zip")) return "email/zip submit";
-      if (key.includes("email")) return "email submit";
-      if (key.includes("credit card") || key.includes("cc submit")) return "credit card submit";
-      if (key.includes("single opt")) return "soi";
-      if (key.includes("double opt")) return "doi";
-      return key;
-    }
-
-    function getHardcodedDesc(offer) {
-      const rawType = offer.offer_type ?? offer.category ?? "";
-      return TYPE_TEXT.get(normalizeType(rawType)) || "🎉 Complete this offer to earn rewards!";
+    function getHardcodedDesc() {
+      return "🎉 Complete this offer to earn rewards!";
     }
 
     fetch(offersUrl)
@@ -329,19 +289,9 @@
           offerList.innerHTML = "<p>No offers available.</p>";
           return;
         }
-
-        // Track counts per category
-        const typeCounters = {};
-
         list.forEach(o => {
           const clickUrl = o.offerlink || o.offer_url || o.preview_url || "#";
-          const baseDesc = getHardcodedDesc(o);
-          const typeKey = normalizeType(o.offer_type ?? o.category ?? baseDesc);
-
-          if (!typeCounters[typeKey]) typeCounters[typeKey] = 0;
-          typeCounters[typeKey]++;
-          const desc = `${baseDesc} (${typeCounters[typeKey]})`;
-
+          const desc = getHardcodedDesc(o);
           const card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `<div class="offer-desc">${desc}</div>`;
@@ -361,4 +311,6 @@
         localStorage.setItem("welcomeShown", "true");
       }
     };
-  </
+  </script>
+</body>
+</html>
