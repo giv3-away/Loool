@@ -187,52 +187,134 @@
   <div class="popup" id="popupGoldenGift"><span class="close-btn" onclick="closePopup('popupGoldenGift')">✖</span><p>Complete 4 offers to unlock</p></div>
 
   <script>
-    // === Offers from CPAgrip JSON Feed ===
+    const robuxCounter = document.getElementById("robuxCounter");
+    let robux = 0;
+
+    function addRobux(amount) {
+      robux += amount;
+      robuxCounter.textContent = robux;
+      robuxCounter.classList.add("bump");
+      setTimeout(() => robuxCounter.classList.remove("bump"), 500);
+    }
+
+    // === Fake Feed ===
+    const fakeFeed = document.getElementById("fakeFeed");
+    const fakeUsers = ["Alex", "Sam", "Luna", "Noah", "Mia", "Leo"];
+    function showFakeFeed() {
+      const user = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+      const amount = Math.floor(Math.random() * 200) + 50;
+      fakeFeed.textContent = `${user} just earned ${amount} Robux!`;
+      fakeFeed.style.opacity = 1;
+      fakeFeed.style.transform = "translateX(-50%) translateY(-10px)";
+      setTimeout(() => {
+        fakeFeed.style.opacity = 0;
+        fakeFeed.style.transform = "translateX(-50%) translateY(0)";
+      }, 3000);
+    }
+    setInterval(showFakeFeed, 6000);
+
+    // === Overlay & Popups ===
+    function showPopup(id) {
+      document.getElementById("overlay").classList.add("active");
+      document.getElementById(id).classList.add("show");
+    }
+    function closePopup(id) {
+      document.getElementById("overlay").classList.remove("active");
+      document.getElementById(id).classList.remove("show");
+    }
+    function openCashout() {
+      if (robux < 500) {
+        showPopup("popupError");
+      } else {
+        showPopup("popupUsername");
+      }
+    }
+    function confirmUsername() {
+      closePopup("popupUsername");
+      showPopup("popupAmount");
+    }
+    function confirmAmount() {
+      closePopup("popupAmount");
+      document.getElementById("successMessage").textContent = `Successfully requested ${robux} Robux!`;
+      showPopup("popupSuccess");
+    }
+    function claimWelcome() {
+      addRobux(100);
+      closePopup("popupWelcome");
+    }
+
+    // === Offers ===
     const offerList = document.getElementById("offerList");
     const offersUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
+
+    const TYPE_TEXT = new Map([
+      ["survey", "📝 Answer a quick survey to win!"],
+      ["app install", "📲 Install this app and open it to earn rewards!"],
+      ["mobile install", "📲 Install this app on your phone and open it to earn rewards!"],
+      ["signup", "✍️ Sign up with real info to complete!"],
+      ["pin submit", "📞 Enter your phone number to finish!"],
+      ["sms", "📞 Enter your phone number to finish!"],
+      ["email submit", "📧 Enter your email to unlock rewards!"],
+      ["email/zip submit", "📧 Enter your email or ZIP to unlock rewards!"],
+      ["credit card submit", "💳 Enter your card details to finish registration!"],
+      ["download", "⬇️ Download the file and open it to complete!"],
+      ["soi", "✅ Confirm your email (Single Opt-In) to finish!"],
+      ["doi", "✅ Double confirm your email to complete (Double Opt-In)!"],
+      ["sweepstakes", "🎁 Enter the sweepstakes for a chance to win!"],
+      ["quiz", "❓ Complete this fun quiz to unlock rewards!"],
+      ["registration", "🖊️ Register on the site to complete the task!"],
+      ["purchase", "🛒 Make a purchase to finish this offer!"],
+      ["free trial", "🎟️ Sign up for a free trial to unlock rewards!"],
+      ["mobile subscription", "📱 Subscribe on mobile to complete!"],
+      ["desktop software", "💻 Install the desktop software to finish!"],
+      ["extension install", "🧩 Install the browser extension to earn!"],
+    ]);
+
+    function normalizeType(raw) {
+      if (!raw) return "";
+      let key = raw.toLowerCase().trim();
+      if (key.includes("app install") || key.includes("mobile install")) return "mobile install";
+      if (key.includes("pin") || key.includes("sms")) return "pin submit";
+      if (key.includes("email") && key.includes("zip")) return "email/zip submit";
+      if (key.includes("email")) return "email submit";
+      if (key.includes("credit card") || key.includes("cc submit")) return "credit card submit";
+      if (key.includes("single opt")) return "soi";
+      if (key.includes("double opt")) return "doi";
+      return key;
+    }
+
+    function getHardcodedDesc(offer) {
+      const rawType = offer.offer_type ?? offer.category ?? "";
+      return TYPE_TEXT.get(normalizeType(rawType)) || "🎉 Complete this offer to earn rewards!";
+    }
 
     fetch(offersUrl)
       .then(res => res.json())
       .then(data => {
-        data.offers.forEach(o => {
-          let reward = (parseFloat(o.payout) * 100).toFixed(0);
+        const list = Array.isArray(data) ? data : (data.offers || []);
+        if (!list.length) {
+          offerList.innerHTML = "<p>No offers available.</p>";
+          return;
+        }
 
-          // Hardcoded texts ONLY by offer_type (with generic fallback)
-          let desc = "🎉 Complete this offer to earn rewards!";
-          if (o.offer_type) {
-            switch (o.offer_type.toLowerCase()) {
-              case "survey": desc = "📝 Answer a quick survey to win!"; break;
-              case "app install": desc = "📲 Install this app and open it to earn rewards!"; break;
-              case "signup": desc = "✍️ Sign up with real info to complete!"; break;
-              case "pin submit":
-              case "sms": desc = "📞 Enter your phone number to finish!"; break;
-              case "email submit": desc = "📧 Enter your email to unlock rewards!"; break;
-              case "credit card submit": desc = "💳 Enter your card details to finish registration!"; break;
-              case "download": desc = "⬇️ Download the file and open it to complete!"; break;
-              case "soi": desc = "✅ Confirm your email (Single Opt-In) to finish!"; break;
-              case "doi": desc = "✅ Double confirm your email to complete (Double Opt-In)!"; break;
-              case "sweepstakes": desc = "🎁 Enter the sweepstakes for a chance to win!"; break;
-              case "quiz": desc = "❓ Complete this fun quiz to unlock rewards!"; break;
-              case "registration": desc = "🖊️ Register on the site to complete the task!"; break;
-              case "purchase": desc = "🛒 Make a purchase to finish this offer!"; break;
-              case "free trial": desc = "🎟️ Sign up for a free trial to unlock rewards!"; break;
-              case "mobile subscription": desc = "📱 Subscribe on mobile to complete!"; break;
-              case "desktop software": desc = "💻 Install the desktop software to finish!"; break;
-              case "extension install": desc = "🧩 Install the browser extension to earn!"; break;
-            }
-          }
+        list.forEach(o => {
+          const payout = parseFloat(o.payout ?? o.default_payout ?? 0) || 0;
+          const reward = Math.round(payout * 100);
+          const clickUrl = o.offerlink || o.offer_url || o.preview_url || "#";
+          const desc = getHardcodedDesc(o);
 
-          let card = document.createElement("div");
+          const card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `
             <div class="offer-desc">${desc}</div>
             <div class="offer-reward">+${reward} Robux</div>
           `;
-          card.onclick = () => { window.open(o.offerlink, "_blank"); };
+          card.onclick = () => { if (clickUrl && clickUrl !== "#") window.open(clickUrl, "_blank"); };
           offerList.appendChild(card);
         });
       })
       .catch(err => {
+        console.error("Fetch error:", err);
         offerList.innerHTML = "<p>Offers could not be loaded.</p>";
       });
   </script>
