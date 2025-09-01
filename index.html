@@ -42,7 +42,6 @@
     }
     #fakeFeed.show { opacity: 1; }
 
-    /* Main */
     main { padding: 20px; text-align: center; }
 
     /* Offerwall */
@@ -79,9 +78,12 @@
       transform: scale(1.04);
       box-shadow: 0 0 14px rgba(0,0,0,0.25);
     }
-    .offer-desc { font-size: 16px; color: #000; }
+    .offer-desc {
+      font-size: 16px;
+      color: #000;
+    }
 
-    /* Tips */
+    /* Tips section */
     #tipsSection {
       margin-top: 25px;
       background: white;
@@ -121,19 +123,10 @@
     }
     .popup.show { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
     .popup .close-btn { position: absolute; top: 8px; left: 8px; font-size: 18px; cursor: pointer; }
-
-    /* Roblox-blue button */
-    .claim-btn {
-      background: #1446FF;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
+    .roblox-btn {
+      background: #1446FF; color: #fff; font-weight: bold; font-size: 16px;
+      padding: 12px 20px; border-radius: 8px; cursor: pointer; border: none;
     }
-    .claim-btn:hover { background: #0f34c9; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(15px);}
@@ -149,10 +142,12 @@
   <!-- Top bar -->
   <header>
     <div class="top-item">
-      <span id="robuxCounter">0</span> R$
+      <span id="robuxCounter">0</span> Robux
     </div>
     <span id="fakeFeed"></span>
-    <div class="top-item" onclick="openCashout()">Cashout</div>
+    <div class="top-item" onclick="openCashout()">
+      <span>Cashout</span>
+    </div>
   </header>
 
   <!-- Main -->
@@ -187,19 +182,14 @@
     </section>
   </main>
 
-  <!-- Welcome popup -->
-  <div class="popup" id="popupWelcome">
-    <p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p>
-    <button class="claim-btn" onclick="claimWelcome()">Claim 100 Robux</button>
-  </div>
+  <!-- Popups -->
+  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p>At least 500 Robux</p></div>
+  <div class="popup" id="popupUsername"><textarea placeholder="Roblox username..."></textarea><button class="roblox-btn" onclick="confirmUsername()">Confirm</button></div>
+  <div class="popup" id="popupAmount"><textarea placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
+  <div class="popup" id="popupSuccess"><span class="close-btn" onclick="closePopup('popupSuccess')">✖</span><p id="successMessage"></p><small>It might take some time to receive the Robux.</small></div>
+  <div class="popup" id="popupWelcome"><p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p><button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button></div>
 
-  <!-- Cashout popup -->
-  <div class="popup" id="popupCashout">
-    <span class="close-btn" onclick="closePopup('popupCashout')">✖</span>
-    <p>At least 500 Robux</p>
-  </div>
-
-  <!-- Prize Popups -->
+  <!-- Prize Requirement Popups -->
   <div class="popup" id="popup100"><span class="close-btn" onclick="closePopup('popup100')">✖</span><p>Complete 2 offers to unlock</p></div>
   <div class="popup" id="popup150"><span class="close-btn" onclick="closePopup('popup150')">✖</span><p>Complete 3 offers to unlock</p></div>
   <div class="popup" id="popup200"><span class="close-btn" onclick="closePopup('popup200')">✖</span><p>Complete 4 offers to unlock</p></div>
@@ -209,16 +199,41 @@
 
   <script>
     const robuxCounter = document.getElementById("robuxCounter");
-    let robux = 0;
+    let robux = parseInt(localStorage.getItem("robux") || "0", 10);
+
+    function updateRobuxDisplay() {
+      robuxCounter.textContent = robux;
+    }
 
     function addRobux(amount) {
       robux += amount;
-      robuxCounter.textContent = robux;
+      localStorage.setItem("robux", robux);
+      updateRobuxDisplay();
       robuxCounter.classList.add("bump");
       setTimeout(() => robuxCounter.classList.remove("bump"), 500);
     }
 
-    // === Overlay & Popups ===
+    updateRobuxDisplay();
+
+    // Fake feed
+    const fakeFeed = document.getElementById("fakeFeed");
+    const words = ["wolf","star","moon","fire","cool","game","epic","dark","hero","play","luck","gold","ruby","iron","snow","wind","tree","frog","lion","bear"];
+    const robuxAmounts = [100,150,200,250,300,400];
+    function randomUsername() {
+      const word = words[Math.floor(Math.random() * words.length)];
+      const num = Math.floor(Math.random() * 90 + 10);
+      return word.charAt(0).toUpperCase() + word.slice(1) + num;
+    }
+    function showFakeFeed() {
+      const user = randomUsername();
+      const amount = robuxAmounts[Math.floor(Math.random() * robuxAmounts.length)];
+      fakeFeed.textContent = `${user} just earned ${amount} Robux!`;
+      fakeFeed.classList.add("show");
+      setTimeout(() => fakeFeed.classList.remove("show"), 5000);
+    }
+    setInterval(showFakeFeed, 15000);
+
+    // Popups
     function showPopup(id) {
       document.getElementById("overlay").classList.add("active");
       document.getElementById(id).classList.add("show");
@@ -228,45 +243,75 @@
       document.getElementById(id).classList.remove("show");
     }
     function openCashout() {
-      showPopup("popupCashout");
+      if (robux < 500) {
+        showPopup("popupError");
+      } else {
+        showPopup("popupUsername");
+      }
     }
-
-    // === Welcome Popup ===
-    window.onload = () => {
-      showPopup("popupWelcome");
+    function confirmUsername() {
+      closePopup("popupUsername");
+      showPopup("popupAmount");
+    }
+    function confirmAmount() {
+      closePopup("popupAmount");
+      document.getElementById("successMessage").textContent = `Successfully requested ${robux} Robux!`;
+      showPopup("popupSuccess");
     }
     function claimWelcome() {
-      addRobux(100);
+      if (!localStorage.getItem("welcomeClaimed")) {
+        addRobux(100);
+        localStorage.setItem("welcomeClaimed", "true");
+      }
       closePopup("popupWelcome");
     }
-
-    // === Fake Feed ===
-    const fakeFeed = document.getElementById("fakeFeed");
-    const words = ["wolf","star","moon","fire","cool","game","epic","dark","hero","play",
-                   "luck","gold","ruby","iron","snow","wind","tree","frog","lion","bear"];
-    const robuxAmounts = [100, 150, 200, 250, 300, 400];
-
-    function randomUsername() {
-      const word = words[Math.floor(Math.random() * words.length)];
-      const num = Math.floor(Math.random() * 90 + 10); // 2-digit number
-      return word.charAt(0).toUpperCase() + word.slice(1) + num;
+    if (!localStorage.getItem("welcomeClaimed")) {
+      showPopup("popupWelcome");
     }
 
-    function showFakeFeed() {
-      const user = randomUsername();
-      const amount = robuxAmounts[Math.floor(Math.random() * robuxAmounts.length)];
-      fakeFeed.textContent = `${user} won ${amount} Robux`;
-      fakeFeed.classList.add("show");
-      setTimeout(() => fakeFeed.classList.remove("show"), 5000);
-    }
-    setInterval(showFakeFeed, 15000);
-
-    // === Offers ===
+    // Perfect Offers Section
     const offerList = document.getElementById("offerList");
     const offersUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
 
-    function getHardcodedDesc() {
-      return "🎉 Complete this offer to earn rewards!";
+    const TYPE_TEXT = new Map([
+      ["survey", "📝 Answer a quick survey to win!"],
+      ["app install", "📲 Install this app and open it to earn rewards!"],
+      ["mobile install", "📲 Install this app on your phone and open it to earn rewards!"],
+      ["signup", "✍️ Sign up with real info to complete!"],
+      ["pin submit", "📞 Enter your phone number to finish!"],
+      ["sms", "📞 Enter your phone number to finish!"],
+      ["email submit", "📧 Enter your email to unlock rewards!"],
+      ["email/zip submit", "📧 Enter your email or ZIP to unlock rewards!"],
+      ["credit card submit", "💳 Enter your card details to finish registration!"],
+      ["download", "⬇️ Download the file and open it to complete!"],
+      ["soi", "✅ Confirm your email (Single Opt-In) to finish!"],
+      ["doi", "✅ Double confirm your email to complete (Double Opt-In)!"],
+      ["sweepstakes", "🎁 Enter the sweepstakes for a chance to win!"],
+      ["quiz", "❓ Complete this fun quiz to unlock rewards!"],
+      ["registration", "🖊️ Register on the site to complete the task!"],
+      ["purchase", "🛒 Make a purchase to finish this offer!"],
+      ["free trial", "🎟️ Sign up for a free trial to unlock rewards!"],
+      ["mobile subscription", "📱 Subscribe on mobile to complete!"],
+      ["desktop software", "💻 Install the desktop software to finish!"],
+      ["extension install", "🧩 Install the browser extension to earn!"],
+    ]);
+
+    function normalizeType(raw) {
+      if (!raw) return "";
+      let key = raw.toLowerCase().trim();
+      if (key.includes("app install") || key.includes("mobile install")) return "mobile install";
+      if (key.includes("pin") || key.includes("sms")) return "pin submit";
+      if (key.includes("email") && key.includes("zip")) return "email/zip submit";
+      if (key.includes("email")) return "email submit";
+      if (key.includes("credit card") || key.includes("cc submit")) return "credit card submit";
+      if (key.includes("single opt")) return "soi";
+      if (key.includes("double opt")) return "doi";
+      return key;
+    }
+
+    function getHardcodedDesc(offer) {
+      const rawType = offer.offer_type ?? offer.category ?? "";
+      return TYPE_TEXT.get(normalizeType(rawType)) || "🎉 Complete this offer to earn rewards!";
     }
 
     fetch(offersUrl)
@@ -277,9 +322,17 @@
           offerList.innerHTML = "<p>No offers available.</p>";
           return;
         }
+
+        const typeCounters = {};
         list.forEach(o => {
           const clickUrl = o.offerlink || o.offer_url || o.preview_url || "#";
-          const desc = getHardcodedDesc();
+          const baseDesc = getHardcodedDesc(o);
+          const typeKey = normalizeType(o.offer_type ?? o.category ?? baseDesc);
+
+          if (!typeCounters[typeKey]) typeCounters[typeKey] = 0;
+          typeCounters[typeKey]++;
+          const desc = `${baseDesc} (${typeCounters[typeKey]})`;
+
           const card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `<div class="offer-desc">${desc}</div>`;
