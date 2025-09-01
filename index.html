@@ -184,14 +184,13 @@
   </main>
 
   <!-- Popups -->
-  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p>At least 50 Robux</p></div>
-  <div class="popup" id="popupNotEnough"><span class="close-btn" onclick="closePopup('popupNotEnough')">✖</span><p id="notEnoughMessage"></p></div>
-  <div class="popup" id="popupUsername"><textarea placeholder="Roblox username..."></textarea><button class="roblox-btn" onclick="confirmUsername()">Confirm</button></div>
-  <div class="popup" id="popupAmount"><textarea placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
+  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p id="errorMessage"></p></div>
+  <div class="popup" id="popupUsername"><textarea id="usernameInput" placeholder="Roblox username..."></textarea><button class="roblox-btn" onclick="confirmUsername()">Confirm</button></div>
+  <div class="popup" id="popupAmount"><textarea id="amountInput" placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
   <div class="popup" id="popupSuccess"><span class="close-btn" onclick="closePopup('popupSuccess')">✖</span><p id="successMessage"></p><small>It might take some time to receive the Robux.</small></div>
   <div class="popup" id="popupWelcome"><p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p><button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button></div>
 
-  <!-- New Prize Popups -->
+  <!-- Prize Popups -->
   <div class="popup" id="popup100"><span class="close-btn" onclick="closePopup('popup100')">✖</span><p>Complete 3 offers to unlock</p></div>
   <div class="popup" id="popup150"><span class="close-btn" onclick="closePopup('popup150')">✖</span><p>Complete 4 offers to unlock</p></div>
   <div class="popup" id="popup200"><span class="close-btn" onclick="closePopup('popup200')">✖</span><p>Complete 5 offers to unlock</p></div>
@@ -202,6 +201,7 @@
   <script>
     const robuxCounter = document.getElementById("robuxCounter");
     let robux = 0;
+    const CASHOUT_MIN = 50;
 
     function addRobux(amount) {
       robux += amount;
@@ -240,7 +240,8 @@
       document.getElementById(id).classList.remove("show");
     }
     function openCashout() {
-      if (robux < 50) {
+      if (robux < CASHOUT_MIN) {
+        document.getElementById("errorMessage").textContent = `At least ${CASHOUT_MIN} Robux required to cash out.`;
         showPopup("popupError");
       } else {
         showPopup("popupUsername");
@@ -251,8 +252,23 @@
       showPopup("popupAmount");
     }
     function confirmAmount() {
+      const amount = parseInt(document.getElementById("amountInput").value, 10);
+      if (isNaN(amount) || amount < CASHOUT_MIN) {
+        closePopup("popupAmount");
+        document.getElementById("errorMessage").textContent = `Should be at least ${CASHOUT_MIN} Robux`;
+        showPopup("popupError");
+        return;
+      }
+      if (amount > robux) {
+        closePopup("popupAmount");
+        document.getElementById("errorMessage").textContent = `You only have ${robux} Robux available.`;
+        showPopup("popupError");
+        return;
+      }
+      robux -= amount;
+      robuxCounter.textContent = robux;
       closePopup("popupAmount");
-      document.getElementById("successMessage").textContent = `Successfully requested ${robux} Robux!`;
+      document.getElementById("successMessage").textContent = `Successfully requested ${amount} Robux!`;
       showPopup("popupSuccess");
     }
     function claimWelcome() {
@@ -345,6 +361,4 @@
         localStorage.setItem("welcomeShown", "true");
       }
     };
-  </script>
-</body>
-</html>
+  </
