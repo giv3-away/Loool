@@ -199,27 +199,60 @@
 
           // Hardcoded texts ONLY by offer_type (no fallback text!)
           let desc = "";
-          if (o.offer_type) {
-            switch (o.offer_type.toLowerCase()) {
-              case "survey": desc = "📝 Answer a quick survey to win!"; break;
-              case "app install": desc = "📲 Install this app and open it to earn rewards!"; break;
-              case "signup": desc = "✍️ Sign up with real info to complete!"; break;
-              case "pin submit": case "sms": desc = "📞 Enter your phone number to finish!"; break;
-              case "email submit": desc = "📧 Enter your email to unlock rewards!"; break;
-              case "credit card submit": desc = "💳 Enter your card details to finish registration!"; break;
-              case "download": desc = "⬇️ Download the file and open it to complete!"; break;
-              case "soi": desc = "✅ Confirm your email (Single Opt-In) to finish!"; break;
-              case "doi": desc = "✅ Double confirm your email to complete (Double Opt-In)!"; break;
-              case "sweepstakes": desc = "🎁 Enter the sweepstakes for a chance to win!"; break;
-              case "quiz": desc = "❓ Complete this fun quiz to unlock rewards!"; break;
-              case "registration": desc = "🖊️ Register on the site to complete the task!"; break;
-              case "purchase": desc = "🛒 Make a purchase to finish this offer!"; break;
-              case "free trial": desc = "🎟️ Sign up for a free trial to unlock rewards!"; break;
-              case "mobile subscription": desc = "📱 Subscribe on mobile to complete!"; break;
-              case "desktop software": desc = "💻 Install the desktop software to finish!"; break;
-              case "extension install": desc = "🧩 Install the browser extension to earn!"; break;
-            }
-          }
+          switch (o.offer_type.trim()) {
+  case "App Install": 
+    desc = "📲 Install this app and open it to earn rewards!"; 
+    break;
+  case "Survey": 
+    desc = "📝 Answer a quick survey to win!"; 
+    break;
+  case "Signup": 
+    desc = "✍️ Sign up with real info to complete!"; 
+    break;
+  case "Pin Submit": 
+  case "SMS": 
+    desc = "📞 Enter your phone number to finish!"; 
+    break;
+  case "Email Submit": 
+    desc = "📧 Enter your email to unlock rewards!"; 
+    break;
+  case "Credit Card Submit": 
+    desc = "💳 Enter your card details to finish registration!"; 
+    break;
+  case "Download": 
+    desc = "⬇️ Download the file and open it to complete!"; 
+    break;
+  case "SOI": 
+    desc = "✅ Confirm your email (Single Opt-In) to finish!"; 
+    break;
+  case "DOI": 
+    desc = "✅ Double confirm your email to complete (Double Opt-In)!"; 
+    break;
+  case "Sweepstakes": 
+    desc = "🎁 Enter the sweepstakes for a chance to win!"; 
+    break;
+  case "Quiz": 
+    desc = "❓ Complete this fun quiz to unlock rewards!"; 
+    break;
+  case "Registration": 
+    desc = "🖊️ Register on the site to complete the task!"; 
+    break;
+  case "Purchase": 
+    desc = "🛒 Make a purchase to finish this offer!"; 
+    break;
+  case "Free Trial": 
+    desc = "🎟️ Sign up for a free trial to unlock rewards!"; 
+    break;
+  case "Mobile Subscription": 
+    desc = "📱 Subscribe on mobile to complete!"; 
+    break;
+  case "Desktop Software": 
+    desc = "💻 Install the desktop software to finish!"; 
+    break;
+  case "Extension Install": 
+    desc = "🧩 Install the browser extension to earn!"; 
+    break;
+}
 
           // Skip offers with no known type
           if (!desc) return;
