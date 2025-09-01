@@ -22,23 +22,25 @@
       padding: 12px 20px;
       font-weight: bold;
       position: relative;
-      overflow: hidden;
+      height: 50px;
     }
     .top-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
     #robuxCounter { font-size: 16px; transition: transform 0.3s ease; }
     #robuxCounter.bump { transform: scale(1.3); }
 
-    /* Fake feed (centered) */
+    /* Fake feed (centered both ways) */
     #fakeFeed {
       position: absolute;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       font-size: 14px;
       white-space: nowrap;
-      opacity: 0;
       color: #fff;
-      transition: opacity 1s ease-in-out, transform 0.6s ease-in-out;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
     }
+    #fakeFeed.show { opacity: 1; }
 
     /* Main */
     main { padding: 20px; text-align: center; }
@@ -169,7 +171,7 @@
     </section>
     <section id="prizes">
       <img src="250robux.jpeg" alt="250 Robux" class="prize-img" onclick="showPopup('popup250')">
-      <img src="300robux.jpg" alt="300 Robux" class="prize-img" onclick="showPopup('popup300')">
+      <img src="300robux.jpeg" alt="300 Robux" class="prize-img" onclick="showPopup('popup300')">
       <img src="400robux.jpeg" alt="400 Robux" class="prize-img" onclick="showPopup('popup400')">
     </section>
 
@@ -210,25 +212,22 @@
     // === Fake Feed ===
     const fakeFeed = document.getElementById("fakeFeed");
     const words = ["wolf","star","moon","fire","cool","game","epic","dark","hero","play","luck","gold","ruby","iron","snow","wind","tree","frog","lion","bear"];
+    const robuxAmounts = [100, 150, 200, 250, 300, 400];
 
     function randomUsername() {
       const word = words[Math.floor(Math.random() * words.length)];
-      const num = Math.floor(Math.random() * 90 + 10); // 2-digit number
+      const num = Math.floor(Math.random() * 90 + 10);
       return word.charAt(0).toUpperCase() + word.slice(1) + num;
     }
 
     function showFakeFeed() {
       const user = randomUsername();
-      const amount = Math.floor(Math.random() * 200) + 50;
+      const amount = robuxAmounts[Math.floor(Math.random() * robuxAmounts.length)];
       fakeFeed.textContent = `${user} just earned ${amount} Robux!`;
-      fakeFeed.style.opacity = 1;
-      fakeFeed.style.transform = "translateX(-50%) translateY(-10px)";
-      setTimeout(() => {
-        fakeFeed.style.opacity = 0;
-        fakeFeed.style.transform = "translateX(-50%) translateY(0)";
-      }, 3000);
+      fakeFeed.classList.add("show");
+      setTimeout(() => fakeFeed.classList.remove("show"), 5000);
     }
-    setInterval(showFakeFeed, 6000);
+    setInterval(showFakeFeed, 7000);
 
     // === Overlay & Popups ===
     function showPopup(id) {
@@ -314,19 +313,17 @@
           return;
         }
 
-        // Track counts by description
-        const descCount = {};
+        // Track counts per category
+        const typeCounters = {};
 
         list.forEach(o => {
           const clickUrl = o.offerlink || o.offer_url || o.preview_url || "#";
-          let desc = getHardcodedDesc(o);
+          const baseDesc = getHardcodedDesc(o);
+          const typeKey = normalizeType(o.offer_type ?? o.category ?? baseDesc);
 
-          // Handle duplicates
-          if (!descCount[desc]) descCount[desc] = 0;
-          descCount[desc]++;
-          if (descCount[desc] > 1) {
-            desc += ` (${descCount[desc]})`;
-          }
+          if (!typeCounters[typeKey]) typeCounters[typeKey] = 0;
+          typeCounters[typeKey]++;
+          const desc = `${baseDesc} (${typeCounters[typeKey]})`;
 
           const card = document.createElement("div");
           card.className = "offer-card";
