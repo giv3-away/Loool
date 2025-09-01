@@ -55,27 +55,25 @@
     }
     .offer-card {
       background: #f9fbff;
-      border: 2px solid #ccc; /* gray border */
+      border: 2px solid #ccc;
       border-radius: 10px;
       padding: 12px;
       text-align: left;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
     .offer-card:hover {
       transform: scale(1.03);
       box-shadow: 0 0 12px rgba(0,0,0,0.2);
     }
-    .offer-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #1446FF;
-      margin-bottom: 6px;
-    }
-    .offer-desc {
-      font-size: 13px;
-      color: #000;
-      margin-bottom: 10px;
+    .offer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
     .offer-reward {
       background: #666;
@@ -84,7 +82,17 @@
       font-weight: bold;
       padding: 4px 8px;
       border-radius: 6px;
-      display: inline-block;
+      white-space: nowrap;
+    }
+    .offer-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #1446FF;
+    }
+    .offer-desc {
+      font-size: 13px;
+      color: #000;
+      margin-top: 4px;
     }
 
     /* Tips section */
@@ -182,149 +190,17 @@
   </main>
 
   <!-- Popups -->
-  <div class="popup" id="popupError">
-    <span class="close-btn" onclick="closePopup('popupError')">✖</span>
-    <p>At least 500 Robux</p>
-  </div>
-  <div class="popup" id="popupNotEnough">
-    <span class="close-btn" onclick="closePopup('popupNotEnough')">✖</span>
-    <p id="notEnoughMessage"></p>
-  </div>
-  <div class="popup" id="popupUsername">
-    <textarea placeholder="Roblox username..."></textarea>
-    <button class="roblox-btn" onclick="confirmUsername()">Confirm</button>
-  </div>
-  <div class="popup" id="popupAmount">
-    <textarea placeholder="Amount of Robux..."></textarea>
-    <button class="roblox-btn" onclick="confirmAmount()">Confirm</button>
-  </div>
-  <div class="popup" id="popupSuccess">
-    <span class="close-btn" onclick="closePopup('popupSuccess')">✖</span>
-    <p id="successMessage"></p>
-    <small>It might take some time to receive the Robux.</small>
-  </div>
-  <div class="popup" id="popupWelcome">
-    <p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p>
-    <button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button>
-  </div>
-
-  <!-- Prize Popups -->
-  <div class="popup" id="popupWheel">
-    <span class="close-btn" onclick="closePopup('popupWheel')">✖</span>
-    <p>Complete 2 offers to unlock</p>
-  </div>
-  <div class="popup" id="popupRedGift">
-    <span class="close-btn" onclick="closePopup('popupRedGift')">✖</span>
-    <p>Complete 3 offers to unlock</p>
-  </div>
-  <div class="popup" id="popupGoldenGift">
-    <span class="close-btn" onclick="closePopup('popupGoldenGift')">✖</span>
-    <p>Complete 4 offers to unlock</p>
-  </div>
+  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p>At least 500 Robux</p></div>
+  <div class="popup" id="popupNotEnough"><span class="close-btn" onclick="closePopup('popupNotEnough')">✖</span><p id="notEnoughMessage"></p></div>
+  <div class="popup" id="popupUsername"><textarea placeholder="Roblox username..."></textarea><button class="roblox-btn" onclick="confirmUsername()">Confirm</button></div>
+  <div class="popup" id="popupAmount"><textarea placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
+  <div class="popup" id="popupSuccess"><span class="close-btn" onclick="closePopup('popupSuccess')">✖</span><p id="successMessage"></p><small>It might take some time to receive the Robux.</small></div>
+  <div class="popup" id="popupWelcome"><p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p><button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button></div>
+  <div class="popup" id="popupWheel"><span class="close-btn" onclick="closePopup('popupWheel')">✖</span><p>Complete 2 offers to unlock</p></div>
+  <div class="popup" id="popupRedGift"><span class="close-btn" onclick="closePopup('popupRedGift')">✖</span><p>Complete 3 offers to unlock</p></div>
+  <div class="popup" id="popupGoldenGift"><span class="close-btn" onclick="closePopup('popupGoldenGift')">✖</span><p>Complete 4 offers to unlock</p></div>
 
   <script>
-    // === Anti-cheat ===
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.onkeydown = function(e) {
-      if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && ['I','C','J'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    // Robux counter
-    let robux = parseInt(localStorage.getItem("robux") || "0");
-    function animateNumber(el, start, end, duration = 600) {
-      const range = end - start;
-      const startTime = performance.now();
-      function step(currentTime) {
-        const progress = Math.min((currentTime - startTime) / duration, 1);
-        el.innerText = Math.floor(start + range * progress);
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-    function updateCounter(bump=true) {
-      const counter = document.getElementById("robuxCounter");
-      const currentValue = parseInt(counter.innerText || "0");
-      animateNumber(counter, currentValue, robux, 800);
-      if(bump){
-        counter.classList.add("bump");
-        setTimeout(()=> counter.classList.remove("bump"),300);
-      }
-    }
-    updateCounter(false);
-
-    // Cashout
-    let cashoutUsername = "";
-    function openCashout() {
-      if (robux < 500) { showPopup("popupError"); }
-      else { showPopup("popupUsername"); }
-    }
-    function confirmUsername() {
-      cashoutUsername = document.querySelector("#popupUsername textarea").value.trim();
-      if (cashoutUsername) {
-        closePopup("popupUsername");
-        showPopup("popupAmount");
-      }
-    }
-    function confirmAmount() {
-      let amount = parseInt(document.querySelector("#popupAmount textarea").value.trim());
-      if (!isNaN(amount) && amount > 0) {
-        if (amount > robux) {
-          closePopup("popupAmount");
-          document.getElementById("notEnoughMessage").innerText = "You only have " + robux + " Robux";
-          showPopup("popupNotEnough");
-          return;
-        }
-        robux -= amount;
-        localStorage.setItem("robux", robux);
-        updateCounter();
-        closePopup("popupAmount");
-        document.getElementById("successMessage").innerHTML = "You cashed out " + amount + " Robux";
-        showPopup("popupSuccess");
-      }
-    }
-
-    // Popups
-    function showPopup(id) {
-      document.getElementById("overlay").classList.add("active");
-      const el = document.getElementById(id);
-      el.style.display = "block";
-      setTimeout(()=> el.classList.add("show"), 10);
-    }
-    function closePopup(id) {
-      document.getElementById("overlay").classList.remove("active");
-      const el = document.getElementById(id);
-      el.classList.remove("show");
-      setTimeout(()=> el.style.display="none", 400);
-    }
-
-    // Fake feed
-    const feed = document.getElementById("fakeFeed");
-    const words = ["wolf","star","moon","lava","rock","sand","rain","snow","fire","wind","leaf","iron","gold","aqua","dark","void","nova","opal","crux","zeta"];
-    function showFeed() {
-      const word = words[Math.floor(Math.random() * words.length)];
-      const num = Math.floor(Math.random()*90)+10;
-      const amount = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
-      feed.innerHTML = `${word}${num} won ${amount} Robux!`;
-      feed.style.opacity = 1;
-      setTimeout(() => { feed.style.opacity = 0; }, 5000);
-    }
-    setInterval(showFeed, 15000);
-
-    // Welcome popup
-    if (!localStorage.getItem("welcomeShown")) {
-      setTimeout(()=> showPopup("popupWelcome"), 500);
-      localStorage.setItem("welcomeShown", "true");
-    }
-    function claimWelcome() {
-      robux += 100;
-      localStorage.setItem("robux", robux);
-      updateCounter();
-      closePopup("popupWelcome");
-    }
-
     // === Offers from CPAgrip JSON Feed ===
     const offerList = document.getElementById("offerList");
     const offersUrl = "https://www.cpagrip.com/common/offer_feed_json.php?user_id=2439739&pubkey=23311a81282b777eab88a6d19f0d9493&tracking_id=";
@@ -334,12 +210,39 @@
       .then(data => {
         data.offers.forEach(o => {
           let reward = (parseFloat(o.payout) * 100).toFixed(0);
+
+          // Hardcoded texts for every offer_type
+          let desc = "📲 Complete this offer to earn rewards!";
+          if (o.offer_type) {
+            switch (o.offer_type.toLowerCase()) {
+              case "survey": desc = "📝 Answer a quick survey to win!"; break;
+              case "app install": desc = "📲 Install this app and open it to earn rewards!"; break;
+              case "signup": desc = "✍️ Sign up with real info to complete!"; break;
+              case "pin submit": case "sms": desc = "📞 Enter your phone number to finish!"; break;
+              case "email submit": desc = "📧 Enter your email to unlock rewards!"; break;
+              case "credit card submit": desc = "💳 Enter your card details to finish registration!"; break;
+              case "download": desc = "⬇️ Download the file and open it to complete!"; break;
+              case "soi": desc = "✅ Confirm your email (Single Opt-In) to finish!"; break;
+              case "doi": desc = "✅ Double confirm your email to complete (Double Opt-In)!"; break;
+              case "sweepstakes": desc = "🎁 Enter the sweepstakes for a chance to win!"; break;
+              case "quiz": desc = "❓ Complete this fun quiz to unlock rewards!"; break;
+              case "registration": desc = "🖊️ Register on the site to complete the task!"; break;
+              case "purchase": desc = "🛒 Make a purchase to finish this offer!"; break;
+              case "free trial": desc = "🎟️ Sign up for a free trial to unlock rewards!"; break;
+              case "mobile subscription": desc = "📱 Subscribe on mobile to complete!"; break;
+              case "desktop software": desc = "💻 Install the desktop software to finish!"; break;
+              case "extension install": desc = "🧩 Install the browser extension to earn!"; break;
+            }
+          }
+
           let card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `
-            <div class="offer-title">${o.title || "Untitled Offer"}</div>
-            <div class="offer-desc">${o.description || "Complete this offer to earn rewards!"}</div>
-            <div class="offer-reward">+${reward} Robux</div>
+            <div class="offer-top">
+              <div class="offer-title">${o.title || "Untitled Offer"}</div>
+              <div class="offer-reward">+${reward} Robux</div>
+            </div>
+            <div class="offer-desc">${desc}</div>
           `;
           card.onclick = () => { window.open(o.offerlink, "_blank"); };
           offerList.appendChild(card);
