@@ -80,13 +80,6 @@
       font-size: 14px;
       color: #000;
     }
-    .offer-reward {
-      margin-top: 6px;
-      text-align: right;
-      color: #1446FF;
-      font-weight: bold;
-      font-size: 14px;
-    }
 
     /* Tips section */
     #tipsSection {
@@ -170,9 +163,14 @@
 
     <!-- Prize Images -->
     <section id="prizes">
-      <img src="wheel.webp" alt="Prize Wheel" class="prize-img" onclick="showPopup('popupWheel')">
-      <img src="redgift.jpg" alt="Red Gift" class="prize-img" onclick="showPopup('popupRedGift')">
-      <img src="goldengift.jpeg" alt="Golden Gift" class="prize-img" onclick="showPopup('popupGoldenGift')">
+      <img src="100robux.jpeg" alt="100 Robux" class="prize-img" onclick="showPopup('popup100')">
+      <img src="150robux.jpeg" alt="150 Robux" class="prize-img" onclick="showPopup('popup150')">
+      <img src="200robux.jpeg" alt="200 Robux" class="prize-img" onclick="showPopup('popup200')">
+    </section>
+    <section id="prizes">
+      <img src="250robux.jpeg" alt="250 Robux" class="prize-img" onclick="showPopup('popup250')">
+      <img src="300robux.jpeg" alt="300 Robux" class="prize-img" onclick="showPopup('popup300')">
+      <img src="400robux.jpeg" alt="400 Robux" class="prize-img" onclick="showPopup('popup400')">
     </section>
 
     <!-- Offers -->
@@ -189,9 +187,14 @@
   <div class="popup" id="popupAmount"><textarea placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
   <div class="popup" id="popupSuccess"><span class="close-btn" onclick="closePopup('popupSuccess')">✖</span><p id="successMessage"></p><small>It might take some time to receive the Robux.</small></div>
   <div class="popup" id="popupWelcome"><p><b>Welcome to EazyRobux</b><br>Win Robux by completing easy offers</p><button class="roblox-btn" onclick="claimWelcome()">Claim 100 Robux</button></div>
-  <div class="popup" id="popupWheel"><span class="close-btn" onclick="closePopup('popupWheel')">✖</span><p>Complete 2 offers to unlock</p></div>
-  <div class="popup" id="popupRedGift"><span class="close-btn" onclick="closePopup('popupRedGift')">✖</span><p>Complete 3 offers to unlock</p></div>
-  <div class="popup" id="popupGoldenGift"><span class="close-btn" onclick="closePopup('popupGoldenGift')">✖</span><p>Complete 4 offers to unlock</p></div>
+
+  <!-- New Prize Popups -->
+  <div class="popup" id="popup100"><span class="close-btn" onclick="closePopup('popup100')">✖</span><p>Complete 3 offers to unlock</p></div>
+  <div class="popup" id="popup150"><span class="close-btn" onclick="closePopup('popup150')">✖</span><p>Complete 4 offers to unlock</p></div>
+  <div class="popup" id="popup200"><span class="close-btn" onclick="closePopup('popup200')">✖</span><p>Complete 5 offers to unlock</p></div>
+  <div class="popup" id="popup250"><span class="close-btn" onclick="closePopup('popup250')">✖</span><p>Complete 6 offers to unlock</p></div>
+  <div class="popup" id="popup300"><span class="close-btn" onclick="closePopup('popup300')">✖</span><p>Complete 7 offers to unlock</p></div>
+  <div class="popup" id="popup400"><span class="close-btn" onclick="closePopup('popup400')">✖</span><p>Complete 8 offers to unlock</p></div>
 
   <script>
     const robuxCounter = document.getElementById("robuxCounter");
@@ -311,18 +314,23 @@
           return;
         }
 
+        // Track counts by description
+        const descCount = {};
+
         list.forEach(o => {
-          const payout = parseFloat(o.payout ?? o.default_payout ?? 0) || 0;
-          const reward = Math.round(payout * 100);
           const clickUrl = o.offerlink || o.offer_url || o.preview_url || "#";
-          const desc = getHardcodedDesc(o);
+          let desc = getHardcodedDesc(o);
+
+          // Handle duplicates
+          if (!descCount[desc]) descCount[desc] = 0;
+          descCount[desc]++;
+          if (descCount[desc] > 1) {
+            desc += ` (${descCount[desc]})`;
+          }
 
           const card = document.createElement("div");
           card.className = "offer-card";
-          card.innerHTML = `
-            <div class="offer-desc">${desc}</div>
-            <div class="offer-reward">+${reward} Robux</div>
-          `;
+          card.innerHTML = `<div class="offer-desc">${desc}</div>`;
           card.onclick = () => { if (clickUrl && clickUrl !== "#") window.open(clickUrl, "_blank"); };
           offerList.appendChild(card);
         });
