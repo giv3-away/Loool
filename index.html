@@ -55,7 +55,7 @@
     }
     .offer-card {
       background: #f9fbff;
-      border: 2px solid #1446FF;
+      border: 2px solid #ccc; /* gray border */
       border-radius: 10px;
       padding: 12px;
       text-align: left;
@@ -64,14 +64,7 @@
     }
     .offer-card:hover {
       transform: scale(1.03);
-      box-shadow: 0 0 12px rgba(20,70,255,0.3);
-    }
-    .offer-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
     }
     .offer-title {
       font-size: 16px;
@@ -323,8 +316,7 @@
           let card = document.createElement("div");
           card.className = "offer-card";
           card.innerHTML = `
-            <img src="${o.offerphoto}" alt="Offer">
-            <div class="offer-title">${o.offer_name}</div>
+            <div class="offer-title">${o.title || "Untitled Offer"}</div>
             <div class="offer-desc">${o.description || "Complete this offer to earn rewards!"}</div>
           `;
           card.onclick = () => { window.open(o.offerlink, "_blank"); };
