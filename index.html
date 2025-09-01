@@ -184,7 +184,7 @@
   </main>
 
   <!-- Popups -->
-  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p>At least 500 Robux</p></div>
+  <div class="popup" id="popupError"><span class="close-btn" onclick="closePopup('popupError')">✖</span><p>At least 50 Robux</p></div>
   <div class="popup" id="popupNotEnough"><span class="close-btn" onclick="closePopup('popupNotEnough')">✖</span><p id="notEnoughMessage"></p></div>
   <div class="popup" id="popupUsername"><textarea placeholder="Roblox username..."></textarea><button class="roblox-btn" onclick="confirmUsername()">Confirm</button></div>
   <div class="popup" id="popupAmount"><textarea placeholder="Amount of Robux..."></textarea><button class="roblox-btn" onclick="confirmAmount()">Confirm</button></div>
@@ -240,7 +240,7 @@
       document.getElementById(id).classList.remove("show");
     }
     function openCashout() {
-      if (robux < 500) {
+      if (robux < 50) {
         showPopup("popupError");
       } else {
         showPopup("popupUsername");
